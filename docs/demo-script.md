@@ -24,7 +24,7 @@ Narration: "I describe the repetitive task in plain language, choose an agent ba
 
 ### 0:45-1:35 - Generate and verify
 
-Submit a small deterministic task such as a temperature converter or CSV cleanup utility. Show the Spec, Generate, and Verify steps as the timeline advances.
+Choose the "Triage repetitive requests" starter and submit a deterministic request queue tool. Show the Spec, Generate, and Verify steps as the timeline advances, then run the generated tool to reveal its prioritized action queue.
 
 Narration: "The same operation layer serves the browser and CLI. The model generates the files, then the acceptance commands run through the configured policy gate. A failed check stays visible and cannot be presented as a successful release."
 
@@ -49,6 +49,8 @@ Narration: "Finally, FlowForge rechecks the signatures, hashes the source, and r
 ## Fallback path
 
 If the configured provider is unavailable, use a previously completed local run or show the browser UI, the static capability notice, the artifact explorer, and the verification documentation. Do not simulate a passing run or claim that an unverified integration worked.
+
+For a credential-free engineering fallback, run `powershell -ExecutionPolicy Bypass -File .\evals\run_offline_fixture.ps1` and show the real acceptance, signed provenance, SBOM, and `verify-file` output. Label this as the deterministic evidence fixture, not as provider-backed AI generation.
 
 ## Recording checklist
 

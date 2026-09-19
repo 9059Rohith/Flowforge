@@ -8,7 +8,7 @@ Next-Gen Productivity and Automation.
 
 | Track need | FlowForge capability | Evidence |
 | --- | --- | --- |
-| Automate repetitive work | Plain-language intent becomes a generated utility or workflow | `web/index.html`, `src/spec_cycle.rs` |
+| Automate repetitive work | Plain-language intent becomes a generated utility or workflow; the triage starter and offline fixture produce a prioritized action queue | `web/index.html`, `src/spec_cycle.rs`, `evals/fixtures/repetitive-request-triage/` |
 | Streamline workflows | One flow covers authoring, generation, checks, release, and verification | `src/ops.rs`, `src/server.rs`, `src/cli.rs` |
 | Delegate work to agents | BasePort supports swappable native and bridged agent runtimes | `src/ports/base.rs`, `src/adapters/` |
 | Organize information | Specs, events, artifacts, SBOMs, attestations, and run state are structured | `src/runstate.rs`, `src/core/` |
