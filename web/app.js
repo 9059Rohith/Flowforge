@@ -125,7 +125,12 @@ async function loadModels() {
   catch (e) { err = e.message; }
   for (const id of ["#authormodel", "#basemodel"]) {
     const sel = $(id); const keep = sel.value;
-    sel.innerHTML = '<option value="">default</option>' + models.map((m) => `<option value="${m}">${m}</option>`).join("");
+    sel.textContent = "";
+    const fallback = el("option"); fallback.value = ""; fallback.textContent = "default"; sel.appendChild(fallback);
+    models.forEach((m) => {
+      const value = String(m); const option = el("option");
+      option.value = value; option.textContent = value; sel.appendChild(option);
+    });
     if (keep) sel.value = keep;
   }
   $("#modelhint").textContent = models.length
@@ -997,7 +1002,9 @@ function fileIcon(p) {
 }
 function artNode(tree, id, icon, label, tag, child, fn) {
   const n = el("div", "tnode" + (child ? " child" : ""));
-  n.innerHTML = `<span class="ticon">${icon}</span><span class="tlabel">${escapeHtml(label)}</span>` + (tag ? `<span class="ttag">${tag}</span>` : "");
+  const tagClass = tag === "ai" || tag === "human" ? ` tag-${tag}` : "";
+  n.innerHTML = `<span class="ticon">${escapeHtml(icon)}</span><span class="tlabel">${escapeHtml(label)}</span>`
+    + (tag ? `<span class="ttag${tagClass}">${escapeHtml(tag)}</span>` : "");
   n.onclick = () => selectArt(id);
   tree.appendChild(n); ARTNODES[id] = { el: n, fn };
 }
@@ -1011,7 +1018,7 @@ function renderExplorer() {
   const tree = $("#arttree"); tree.innerHTML = ""; ARTNODES = {};
   const fl = el("div", "tfolder"); fl.textContent = `Software · ${a.files.length} file(s)`; tree.appendChild(fl);
   a.files.forEach((f, i) => artNode(tree, "file" + i, fileIcon(f.path), f.path.split("/").pop(),
-    `<span class="tag-${f.author}">${f.author}</span>`, true, () => renderFile(f)));
+    f.author, true, () => renderFile(f)));
   if (a.attestation) artNode(tree, "aibom", "📄", "AI-BOM", "", false, () => renderAiBom(a.attestation));
   if (a.sbom) artNode(tree, "sbom", "📄", "SBOM", "", false, () => renderSbom(a.sbom));
   artNode(tree, "audit", "📜", "Audit trail", "", false, () => {

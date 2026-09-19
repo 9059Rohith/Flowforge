@@ -12,6 +12,7 @@ Implemented controls include:
 - Hard execution timeouts for acceptance and ad-hoc product commands.
 - Process output capture with explicit failure results.
 - Component-aware generated-file path validation with canonical workspace containment and symlink rejection.
+- Provider model IDs and artifact metadata are rendered through DOM text nodes or escaped markup in the browser UI.
 - Opaque-origin sandboxed iframes for browser-authored JavaScript checks.
 - Signed attestations over artifact digests.
 - N-of-M maintainer policy modes.
