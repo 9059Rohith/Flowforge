@@ -48,6 +48,9 @@ FlowForge should not be called competitive until all of these have evidence:
 - A repeatable offline evaluation command reports acceptance and verification results; provider-backed generation is measured separately.
 - CI runs formatting, clippy, tests, release build, and browser syntax checks.
 - A deployed instance has authentication, persistent storage, health checks, and a tested smoke path.
+- FlowForge now has a locally built and container-smoked server profile with a persistent
+  workspace volume, non-root runtime user, and Docker healthcheck; hosted deployment and
+  external authentication remain unverified.
 - Screenshots, demo video, and README links point only to real artifacts.
 
 ## Current Honest Position

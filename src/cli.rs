@@ -179,6 +179,10 @@ enum Cmd {
         /// Repo/workspace root the UI operates on (forges live under it).
         #[arg(long, default_value = "demo/.work/web")]
         repo: PathBuf,
+        /// Interface or host name to bind. Localhost is the safe default; use 0.0.0.0 only
+        /// behind an external authentication and TLS boundary.
+        #[arg(long, default_value = "127.0.0.1")]
+        host: String,
         #[arg(long, default_value_t = 8787)]
         port: u16,
         #[arg(long)]
@@ -267,10 +271,15 @@ pub fn run() -> Result<()> {
         } => cmd_attest(&spec, &repo, &gate, policy.as_deref()),
         Cmd::Reputation { repo } => cmd_reputation(&repo),
         Cmd::List { repo } => cmd_list(&repo),
-        Cmd::Serve { repo, port, policy } => {
+        Cmd::Serve {
+            repo,
+            host,
+            port,
+            policy,
+        } => {
             let repo = abs(&repo)?;
             std::fs::create_dir_all(&repo)?;
-            crate::server::serve(repo, port, load_policy(policy.as_deref())?)
+            crate::server::serve(repo, host, port, load_policy(policy.as_deref())?)
         }
     }
 }

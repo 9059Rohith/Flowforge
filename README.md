@@ -145,6 +145,8 @@ Codex is a first-class native base, not a README-only claim. The adapter invokes
 |-- demo/                  # local demo scripts
 |-- integrations/          # optional agent-base adapters
 |-- forges/                # optional Forgejo/Gitea local stack
+|-- Dockerfile             # non-root server container profile
+|-- .dockerignore          # keeps secrets and build output out of image context
 |-- .env.example           # safe environment template
 |-- ARCHITECTURE.md        # system boundaries and data flow
 |-- AI_USAGE.md            # factual AI usage and limitations
@@ -171,7 +173,7 @@ cargo build --release
 ```bash
 ./init.sh
 cargo build --release
-./target/release/openfab serve --repo demo/.work/web --port 8787 --policy policy/trust.json
+./target/release/openfab serve --repo demo/.work/web --host 127.0.0.1 --port 8787 --policy policy/trust.json
 ```
 
 Open `http://127.0.0.1:8787`.
@@ -232,7 +234,7 @@ liveness probe is available at `GET /health` when the local/server binary is run
 Run the release binary on a host with a persistent workspace:
 
 ```bash
-./openfab serve --repo /var/lib/flowforge/workspace --port 8787 --policy policy/trust.json
+./openfab serve --repo /var/lib/flowforge/workspace --host 127.0.0.1 --port 8787 --policy policy/trust.json
 ```
 
 For a local PowerShell session using Groq, for example:
@@ -241,13 +243,34 @@ For a local PowerShell session using Groq, for example:
 $env:OPENFAB_LLM = "groq"
 $env:GROQ_API_KEY = "<your-key>"
 $env:OPENFAB_GROQ_MODEL = "<a-model-enabled-for-your-account>"
-.\target\release\openfab.exe serve --repo demo/.work/web --port 8787 --policy policy/trust.json
+.\target\release\openfab.exe serve --repo demo/.work/web --host 127.0.0.1 --port 8787 --policy policy/trust.json
 ```
 
 OpenAI uses the same setup with `OPENFAB_LLM=openai`, `OPENAI_API_KEY`, and
 `OPENFAB_OPENAI_MODEL`. Do not put the real values in the repository.
 
 Use a reverse proxy and TLS before exposing the local server beyond localhost. The current server has no application login layer, so remote exposure requires an external authentication boundary.
+
+### Container deployment
+
+The repository includes a multi-stage [`Dockerfile`](Dockerfile) for server mode. It runs as a
+non-root user, keeps the workspace on a writable volume, includes the `git`, `curl`, and
+`python3` tools used by the supported local execution path, and exposes `/health` for a
+platform probe. It intentionally binds the container to `0.0.0.0`; place it behind an
+authenticated reverse proxy or private network before making it reachable by untrusted users.
+
+```bash
+docker build -t flowforge:local .
+docker run --rm -p 8787:8787 \
+  -e OPENFAB_LLM=openai \
+  -e OPENAI_API_KEY="<rotated-key>" \
+  -e OPENFAB_OPENAI_MODEL="<model-enabled-for-your-account>" \
+  -v flowforge-workspace:/var/lib/flowforge/workspace \
+  flowforge:local
+```
+
+The container recipe is deployment preparation, not a claim that a hosted instance has been
+deployed or authenticated from this workspace.
 
 No live deployment URL is included because deployment has not been performed or verified from this workspace.
 
@@ -279,6 +302,10 @@ Verified in this workspace with stable Rust 1.98.1 using the GNU Windows toolcha
 The credential-free trust path is also reproducible with [`evals/run_offline_fixture.ps1`](evals/run_offline_fixture.ps1): the default repetitive-request fixture turns notes into a prioritized action queue, runs three sandboxed acceptance checks, writes signed provenance and an SBOM, and re-verifies the source and contract with `verify-file`. This fixture does not claim provider-backed AI generation; that path requires a configured OpenAI, Groq, or other supported provider.
 
 The release server smoke path is reproducible with [`evals/smoke_server.ps1`](evals/smoke_server.ps1). It starts a temporary local workspace, checks `/health`, the embedded UI, `/api/bases`, and `/api/forges`, then removes the workspace without requiring provider credentials.
+
+The container profile was also built and smoke-tested locally. The isolated image returned the
+FlowForge health payload, reached Docker's `healthy` state, and ran as the non-root `flowforge`
+user. This is local evidence for the recipe, not a hosted deployment claim.
 
 ## Demo Materials
 

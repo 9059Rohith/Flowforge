@@ -52,8 +52,8 @@ struct State {
     launched: Mutex<HashMap<String, (u32, u16)>>,
 }
 
-pub fn serve(repo: PathBuf, port: u16, policy: Policy) -> Result<()> {
-    let addr = format!("127.0.0.1:{port}");
+pub fn serve(repo: PathBuf, host: String, port: u16, policy: Policy) -> Result<()> {
+    let addr = format!("{host}:{port}");
     let server = Server::http(&addr).map_err(|e| anyhow::anyhow!("starting server: {e}"))?;
     let server = Arc::new(server);
     let state = Arc::new(State {

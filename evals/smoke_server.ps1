@@ -1,5 +1,6 @@
 param(
-    [int]$Port = 8793
+    [int]$Port = 8793,
+    [string]$BindHost = "127.0.0.1"
 )
 
 $ErrorActionPreference = "Stop"
@@ -15,7 +16,7 @@ if (-not (Test-Path -LiteralPath $binary)) {
 
 try {
     [System.IO.Directory]::CreateDirectory($repo) | Out-Null
-    $arguments = @("serve", "--repo", $repo, "--port", "$Port", "--policy", $policy)
+    $arguments = @("serve", "--repo", $repo, "--host", $BindHost, "--port", "$Port", "--policy", $policy)
     $proc = Start-Process -FilePath $binary -ArgumentList $arguments -WindowStyle Hidden -PassThru
     $base = "http://127.0.0.1:$Port"
     $paths = @("/health", "/", "/api/bases", "/api/forges")

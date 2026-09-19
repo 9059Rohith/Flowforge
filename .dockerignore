@@ -1,0 +1,14 @@
+.git
+.gitignore
+target
+.env
+.env.*
+!.env.example
+demo/.work
+demo/out
+artifacts
+**/.openfab
+**/__pycache__
+*.pyc
+docs
+assets

@@ -86,6 +86,8 @@ toolchain was later invoked explicitly through `$HOME/.cargo/bin/cargo.exe`.
 - The GitHub Pages automation template no longer writes the previous custom-domain CNAME. It is stored outside the active workflow directory until the target GitHub credential has workflow scope.
 - The CI automation is prepared as `.github/ci-workflow.yml` and remains outside the active workflow directory until the GitHub credential has `workflow` scope.
 - No live deployment was performed because no deployment access or account authorization was provided.
+- Server deployment preparation now includes an opt-in `serve --host` flag that preserves
+  loopback binding by default, plus a non-root multi-stage `Dockerfile` with a healthcheck.
 
 ## Post-change Validation
 
@@ -99,4 +101,6 @@ toolchain was later invoked explicitly through `$HOME/.cargo/bin/cargo.exe`.
 - Python syntax checks passed for the AgentScope and HiClaw adapters.
 - The intent builder includes responsive starter workflow patterns for triage, recurring reports, and release readiness.
 - The offline fixture passed: three acceptance checks, signed provenance, SBOM output, and `verify-file` all completed without provider credentials.
+- The multi-stage Docker image built successfully and its isolated container smoke test returned
+  `/health` with HTTP 200, reached Docker `healthy`, and ran as the non-root `flowforge` user.
 - A fresh visual screenshot of the modified UI remains unverified because no browser-control surface was available in the execution environment.
