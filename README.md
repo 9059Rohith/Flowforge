@@ -180,9 +180,16 @@ The internal binary and protocol identifier remain `openfab` for compatibility. 
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` and configure only the integrations you use. Important groups include:
+Copy `.env.example` to `.env` and configure only the integrations you use. The Rust binary reads
+process environment variables; it does not parse `.env` by itself, so export the values in your
+shell or configure them in your deployment provider. Important groups include:
 
-- `OPENFAB_LLM` and provider-specific Claude, Codex, Ollama, or DashScope settings.
+- `OPENFAB_LLM` and provider-specific Claude, Codex, OpenAI, Groq, Ollama, or DashScope settings.
+- For OpenAI: set `OPENFAB_LLM=openai`, `OPENAI_API_KEY`, and `OPENFAB_OPENAI_MODEL`.
+- For Groq: set `OPENFAB_LLM=groq`, `GROQ_API_KEY`, and `OPENFAB_GROQ_MODEL`.
+- OpenAI and Groq are called through their OpenAI-compatible Chat Completions APIs. Their API keys
+  stay server-side in local/server mode. The model must be available to the account and support
+  JSON responses because FlowForge requests structured specs and file manifests.
 - Codex generation defaults to read-only execution. Set `OPENFAB_CODEX_SANDBOX=workspace-write` only when needed; dangerous full access requires a separate opt-in.
 - `OPENFAB_GITHUB_REMOTE` and an authenticated `gh` CLI for GitHub.
 - `OPENFAB_FORGEJO_*`, `OPENFAB_GITEA_*`, or `OPENFAB_GITCODE_*` for REST forge adapters.
@@ -217,6 +224,18 @@ Run the release binary on a host with a persistent workspace:
 ```bash
 ./openfab serve --repo /var/lib/flowforge/workspace --port 8787 --policy policy/trust.json
 ```
+
+For a local PowerShell session using Groq, for example:
+
+```powershell
+$env:OPENFAB_LLM = "groq"
+$env:GROQ_API_KEY = "<your-key>"
+$env:OPENFAB_GROQ_MODEL = "<a-model-enabled-for-your-account>"
+.\target\release\openfab.exe serve --repo demo/.work/web --port 8787 --policy policy/trust.json
+```
+
+OpenAI uses the same setup with `OPENFAB_LLM=openai`, `OPENAI_API_KEY`, and
+`OPENFAB_OPENAI_MODEL`. Do not put the real values in the repository.
 
 Use a reverse proxy and TLS before exposing the local server beyond localhost. The current server has no application login layer, so remote exposure requires an external authentication boundary.
 

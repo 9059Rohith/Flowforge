@@ -2,6 +2,8 @@
 //!
 //! Providers, selected by `OPENFAB_LLM` (default `claude`):
 //!   • `claude`    — the local `claude` CLI (native to the claude base).
+//!   • `openai`    — OpenAI's OpenAI-compatible API (needs `OPENAI_API_KEY`).
+//!   • `groq`      — Groq's OpenAI-compatible API (needs `GROQ_API_KEY`).
 //!   • `dashscope` — Qwen via the DashScope OpenAI-compatible API (needs
 //!                   `DASHSCOPE_API_KEY`), reached by shelling to `curl` (dependency
 //!                   budget: no HTTP-client crate).
@@ -233,6 +235,14 @@ pub fn complete(prompt: &str) -> Result<(String, String, String)> {
 /// claude CLI keeps its own `OPENFAB_CLAUDE_MODEL`.
 pub fn complete_with(prompt: &str, model: Option<&str>) -> Result<(String, String, String)> {
     match std::env::var("OPENFAB_LLM").unwrap_or_default().as_str() {
+        "openai" => {
+            let (t, m) = openai_text(prompt, model)?;
+            Ok((t, m, "openai".to_string()))
+        }
+        "groq" => {
+            let (t, m) = groq_text(prompt, model)?;
+            Ok((t, m, "groq".to_string()))
+        }
         "dashscope" | "qwen" => {
             let (t, m) = dashscope_text(prompt, model)?;
             Ok((t, m, "dashscope".to_string()))
@@ -253,6 +263,8 @@ pub fn complete_with(prompt: &str, model: Option<&str>) -> Result<(String, Strin
 /// `model` is an optional per-run override for the ollama/dashscope providers.
 pub fn generate_bridge(prompt: &str, model: Option<&str>) -> Result<GenOutput> {
     match std::env::var("OPENFAB_LLM").unwrap_or_default().as_str() {
+        "openai" => generate_openai(prompt, model),
+        "groq" => generate_groq(prompt, model),
         "dashscope" | "qwen" => generate_dashscope(prompt, model),
         "ollama" => generate_ollama(prompt, model),
         _ => generate_claude(prompt),
@@ -278,13 +290,31 @@ fn ollama_model(override_: Option<&str>) -> String {
 pub fn list_ollama_models() -> Result<Vec<String>> {
     let base = std::env::var("OPENFAB_OLLAMA_URL")
         .unwrap_or_else(|_| "http://localhost:11434".to_string());
+    let key = std::env::var("OPENFAB_OLLAMA_KEY").ok();
+    list_models_from_endpoint(&base, key.as_deref())
+}
+
+/// List models for the configured server-side provider. Keys stay server-side.
+pub fn list_configured_models() -> Result<Vec<String>> {
+    match std::env::var("OPENFAB_LLM").unwrap_or_default().as_str() {
+        "openai" => list_models_from_endpoint(
+            "https://api.openai.com",
+            Some(&required_env("OPENAI_API_KEY", "OPENFAB_LLM=openai")?),
+        ),
+        "groq" => list_models_from_endpoint(
+            "https://api.groq.com/openai",
+            Some(&required_env("GROQ_API_KEY", "OPENFAB_LLM=groq")?),
+        ),
+        _ => list_ollama_models(),
+    }
+}
+
+fn list_models_from_endpoint(base: &str, key: Option<&str>) -> Result<Vec<String>> {
     let url = format!("{}/v1/models", base.trim_end_matches('/'));
     let mut args = vec!["-sS".to_string(), url.clone()];
-    if let Ok(key) = std::env::var("OPENFAB_OLLAMA_KEY") {
-        if !key.is_empty() {
-            args.push("-H".to_string());
-            args.push(format!("Authorization: Bearer {key}"));
-        }
+    if let Some(key) = key.filter(|key| !key.is_empty()) {
+        args.push("-H".to_string());
+        args.push(format!("Authorization: Bearer {key}"));
     }
     let stdout = run_capture("curl", &args, timeout_secs())
         .with_context(|| format!("listing models from {url}"))?;
@@ -301,6 +331,10 @@ pub fn list_ollama_models() -> Result<Vec<String>> {
     let mut ids: Vec<String> = list.data.into_iter().map(|m| m.id).collect();
     ids.sort();
     Ok(ids)
+}
+
+fn required_env(name: &str, provider: &str) -> Result<String> {
+    std::env::var(name).map_err(|_| anyhow::anyhow!("{provider} but {name} is not set"))
 }
 
 /// Call Qwen via the DashScope OpenAI-compatible API and return raw text + model.
@@ -402,6 +436,102 @@ fn ollama_text(prompt: &str, model_override: Option<&str>) -> Result<(String, St
         .map(|c| c.message.content.clone())
         .context("Ollama returned no choices (model not pulled? try `ollama pull <model>`)")?;
     Ok((content, model))
+}
+
+fn openai_text(prompt: &str, model_override: Option<&str>) -> Result<(String, String)> {
+    openai_compatible_text(
+        prompt,
+        model_override,
+        "OPENAI_API_KEY",
+        &["OPENFAB_OPENAI_MODEL", "OPENAI_MODEL"],
+        "https://api.openai.com",
+        "openai",
+    )
+}
+
+fn groq_text(prompt: &str, model_override: Option<&str>) -> Result<(String, String)> {
+    openai_compatible_text(
+        prompt,
+        model_override,
+        "GROQ_API_KEY",
+        &["OPENFAB_GROQ_MODEL", "GROQ_MODEL"],
+        "https://api.groq.com/openai",
+        "groq",
+    )
+}
+
+fn openai_compatible_text(
+    prompt: &str,
+    model_override: Option<&str>,
+    key_env: &str,
+    model_envs: &[&str],
+    base: &str,
+    label: &str,
+) -> Result<(String, String)> {
+    let key = required_env(key_env, &format!("OPENFAB_LLM={label}"))?;
+    let model = model_override
+        .map(str::to_string)
+        .filter(|s| !s.is_empty())
+        .or_else(|| {
+            model_envs
+                .iter()
+                .find_map(|name| std::env::var(name).ok().filter(|value| !value.is_empty()))
+        })
+        .ok_or_else(|| {
+            anyhow::anyhow!(
+                "OPENFAB_LLM={label} requires a model; set {}",
+                model_envs[0]
+            )
+        })?;
+    let url = format!("{}/v1/chat/completions", base.trim_end_matches('/'));
+    let body = serde_json::json!({
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0,
+        "stream": false,
+        "response_format": {"type": "json_object"}
+    })
+    .to_string();
+    let args = vec![
+        "-sS".to_string(),
+        "-X".to_string(),
+        "POST".to_string(),
+        url.clone(),
+        "-H".to_string(),
+        format!("Authorization: Bearer {key}"),
+        "-H".to_string(),
+        "Content-Type: application/json".to_string(),
+        "-d".to_string(),
+        body,
+    ];
+    let stdout = run_capture("curl", &args, timeout_secs())
+        .with_context(|| format!("calling {label} via {url}"))?;
+    let env: OpenAiEnvelope = serde_json::from_str(&stdout)
+        .with_context(|| format!("{label} reply was not JSON:\n{stdout}"))?;
+    let content = env
+        .choices
+        .first()
+        .map(|choice| choice.message.content.clone())
+        .with_context(|| format!("{label} returned no choices"))?;
+    Ok((content, model))
+}
+
+pub fn generate_openai(prompt: &str, model: Option<&str>) -> Result<GenOutput> {
+    let (text, model) = openai_text(prompt, model)?;
+    Ok(GenOutput {
+        manifest: parse_manifest(&text)?,
+        model,
+        provider: "openai".to_string(),
+    })
+}
+
+pub fn generate_groq(prompt: &str, model: Option<&str>) -> Result<GenOutput> {
+    let (text, model) = groq_text(prompt, model)?;
+    Ok(GenOutput {
+        manifest: parse_manifest(&text)?,
+        model,
+        provider: "groq".to_string(),
+    })
 }
 
 /// Generate a file manifest with an Ollama model (local or cloud).

@@ -156,9 +156,9 @@ fn route(
                 &json!({ "spec": spec, "model": model, "provider": provider }),
             ))
         }
-        // Models available on the configured Ollama endpoint (key stays server-side).
+        // Models available on the configured server-side provider (key stays server-side).
         (Method::Get, ["api", "models"]) => {
-            match crate::adapters::llm_backend::list_ollama_models() {
+            match crate::adapters::llm_backend::list_configured_models() {
                 Ok(models) => Ok(json_resp(200, &json!({ "models": models }))),
                 Err(e) => Ok(json_resp(
                     200,

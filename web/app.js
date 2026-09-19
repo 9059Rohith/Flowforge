@@ -111,7 +111,7 @@ async function init() {
   await ensureDefaultMaintainers();
 }
 
-// Populate both model pickers from the configured Ollama endpoint (key stays server-side).
+// Populate both model pickers from the configured server-side provider (key stays server-side).
 async function loadModels() {
   let models = [], err = null;
   try { const r = await api("GET", "/api/models"); models = r.models || []; err = r.error; }
@@ -123,7 +123,7 @@ async function loadModels() {
   }
   $("#modelhint").textContent = models.length
     ? `${models.length} models available · empty = each side's configured default. Applies to LLM-driven generation (bridged, agentscope, agent-chat llm-mode); claude & agent-chat orchestrate/team run on their own CLI.`
-    : (err ? `model list unavailable: ${err}` : "no models configured (set OPENFAB_OLLAMA_URL/KEY)");
+    : (err ? `model list unavailable: ${err}` : "no models configured (set the selected provider's model and key)");
 }
 
 async function loadBases() {
