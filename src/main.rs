@@ -5,5 +5,6 @@
 //! — lives in the library so it can be reused and self-tested (PRD §6 self-hosting).
 
 fn main() -> anyhow::Result<()> {
+    openfab::env::load_dotenv()?;
     openfab::cli::run()
 }

@@ -180,9 +180,9 @@ The internal binary and protocol identifier remain `openfab` for compatibility. 
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` and configure only the integrations you use. The Rust binary reads
-process environment variables; it does not parse `.env` by itself, so export the values in your
-shell or configure them in your deployment provider. Important groups include:
+Copy `.env.example` to `.env` and configure only the integrations you use. The local binary loads
+that gitignored file at startup without overriding variables already present in the process.
+Deployment providers should inject variables through their secure environment UI. Important groups include:
 
 - `OPENFAB_LLM` and provider-specific Claude, Codex, OpenAI, Groq, Ollama, or DashScope settings.
 - For OpenAI: set `OPENFAB_LLM=openai`, `OPENAI_API_KEY`, and `OPENFAB_OPENAI_MODEL`.

@@ -8,6 +8,7 @@
 pub mod adapters;
 pub mod cli;
 pub mod core;
+pub mod env;
 pub mod ops;
 pub mod ports;
 pub mod runstate;
