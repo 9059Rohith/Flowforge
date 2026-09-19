@@ -187,6 +187,9 @@ Deployment providers should inject variables through their secure environment UI
 - `OPENFAB_LLM` and provider-specific Claude, Codex, OpenAI, Groq, Ollama, or DashScope settings.
 - For OpenAI: set `OPENFAB_LLM=openai`, `OPENAI_API_KEY`, and `OPENFAB_OPENAI_MODEL`.
 - For Groq: set `OPENFAB_LLM=groq`, `GROQ_API_KEY`, and `OPENFAB_GROQ_MODEL`.
+- You do not need to fill the Claude, Codex, Ollama, DashScope, native-base, or forge blocks
+  unless you use those integrations. With only OpenAI or Groq, configure one provider's three
+  variables and leave the rest blank.
 - OpenAI and Groq are called through their OpenAI-compatible Chat Completions APIs. Their API keys
   stay server-side in local/server mode. The model must be available to the account and support
   JSON responses because FlowForge requests structured specs and file manifests.
