@@ -13,6 +13,8 @@ Implemented controls include:
 - Process output capture with explicit failure results.
 - Component-aware generated-file path validation with canonical workspace containment and symlink rejection.
 - Provider model IDs and artifact metadata are rendered through DOM text nodes or escaped markup in the browser UI.
+- Server responses include `nosniff`, clickjacking, referrer, and browser-permission headers.
+- Unexpected server failures are logged for operators while clients receive a generic 500 response rather than internal error details.
 - Opaque-origin sandboxed iframes for browser-authored JavaScript checks.
 - Signed attestations over artifact digests.
 - N-of-M maintainer policy modes.

@@ -45,10 +45,41 @@ try {
     if ($health.status -ne "ok" -or $health.service -ne "flowforge") {
         throw "health payload did not report FlowForge as healthy"
     }
+    foreach ($header in @(
+        "X-Content-Type-Options",
+        "X-Frame-Options",
+        "Referrer-Policy",
+        "Permissions-Policy"
+    )) {
+        if ([string]::IsNullOrWhiteSpace($responses["/health"].Headers[$header])) {
+            throw "health response did not include $header"
+        }
+    }
     if ($responses["/"].RawContentLength -lt 1000) {
         throw "root UI response was unexpectedly small"
     }
-    Write-Output "SERVER_SMOKE_PASS: /health, /, /api/bases, and /api/forges returned HTTP 200"
+
+    Add-Type -AssemblyName System.Net.Http
+    $client = [System.Net.Http.HttpClient]::new()
+    try {
+        $content = [System.Net.Http.StringContent]::new(
+            "not-json",
+            [System.Text.Encoding]::UTF8,
+            "application/json"
+        )
+        $errorResponse = $client.PostAsync(($base + "/api/run"), $content).GetAwaiter().GetResult()
+        $errorBody = $errorResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+        if ([int]$errorResponse.StatusCode -ne 500) {
+            throw "malformed request did not return HTTP 500"
+        }
+        if ($errorBody -notmatch 'internal server error') {
+            throw "malformed request exposed a non-generic error response"
+        }
+    } finally {
+        $client.Dispose()
+    }
+
+    Write-Output "SERVER_SMOKE_PASS: health/UI/catalog routes, security headers, and generic error handling passed"
 }
 finally {
     if ($proc -and -not $proc.HasExited) {

@@ -10,6 +10,7 @@
 //! operations (run/feedback/signoff) so concurrent requests can't corrupt a repo.
 
 use std::collections::HashMap;
+use std::io::Cursor;
 use std::net::{TcpListener, TcpStream};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -94,7 +95,10 @@ fn handle(mut req: Request, state: &Arc<State>) {
         route(&method, &path, &query, &mut req, state);
     let resp = match result {
         Ok(r) => r,
-        Err(e) => json_resp(500, &json!({ "error": e.to_string() })),
+        Err(e) => {
+            eprintln!("FlowForge HTTP error: {method:?} {path}: {e:#}");
+            json_resp(500, &json!({ "error": "internal server error" }))
+        }
     };
     let _ = req.respond(resp);
 }
@@ -762,28 +766,47 @@ fn body_json(req: &mut Request) -> Result<Value> {
     Ok(serde_json::from_str(&s)?)
 }
 
-fn json_resp(code: u16, v: &Value) -> Response<std::io::Cursor<Vec<u8>>> {
+fn json_resp(code: u16, v: &Value) -> Response<Cursor<Vec<u8>>> {
     let body = serde_json::to_vec(v).unwrap_or_default();
-    Response::from_data(body)
-        .with_status_code(code)
-        .with_header(ctype("application/json"))
+    secure_headers(
+        Response::from_data(body)
+            .with_status_code(code)
+            .with_header(ctype("application/json")),
+    )
 }
 
-fn html(s: &str) -> Response<std::io::Cursor<Vec<u8>>> {
+fn html(s: &str) -> Response<Cursor<Vec<u8>>> {
     asset(s, "text/html; charset=utf-8")
 }
 
-fn asset(s: &str, ct: &str) -> Response<std::io::Cursor<Vec<u8>>> {
-    Response::from_data(s.as_bytes().to_vec()).with_header(ctype(ct))
+fn asset(s: &str, ct: &str) -> Response<Cursor<Vec<u8>>> {
+    secure_headers(Response::from_data(s.as_bytes().to_vec()).with_header(ctype(ct)))
 }
 
 fn ctype(ct: &str) -> Header {
     Header::from_bytes(&b"Content-Type"[..], ct.as_bytes()).unwrap()
 }
 
+fn secure_headers(response: Response<Cursor<Vec<u8>>>) -> Response<Cursor<Vec<u8>>> {
+    response
+        .with_header(header("X-Content-Type-Options", "nosniff"))
+        .with_header(header("X-Frame-Options", "DENY"))
+        .with_header(header("Referrer-Policy", "no-referrer"))
+        .with_header(header(
+            "Permissions-Policy",
+            "camera=(), microphone=(), geolocation=()",
+        ))
+}
+
+fn header(name: &str, value: &str) -> Header {
+    Header::from_bytes(name.as_bytes(), value.as_bytes()).unwrap()
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{FABENGINE_JS, OPENFAB_AGENT_MD};
+    use serde_json::json;
+
+    use super::{json_resp, FABENGINE_JS, OPENFAB_AGENT_MD};
 
     /// Extract the text between `<!-- inject:NAME -->` and `<!-- /inject:NAME -->`.
     fn inject_block<'a>(md: &'a str, name: &str) -> &'a str {
@@ -811,6 +834,28 @@ mod tests {
                      Update SLICE_FALLBACK in web/fabengine.js to match web/openfab-agent.md."
                 );
             }
+        }
+    }
+
+    #[test]
+    fn http_responses_include_security_headers() {
+        let response = json_resp(200, &json!({ "ok": true }));
+        let headers = response.headers();
+        for (name, value) in [
+            ("X-Content-Type-Options", "nosniff"),
+            ("X-Frame-Options", "DENY"),
+            ("Referrer-Policy", "no-referrer"),
+            (
+                "Permissions-Policy",
+                "camera=(), microphone=(), geolocation=()",
+            ),
+        ] {
+            assert!(
+                headers
+                    .iter()
+                    .any(|header| header.field.equiv(name) && header.value.as_str() == value),
+                "missing security header {name}"
+            );
         }
     }
 }

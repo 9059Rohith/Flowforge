@@ -103,4 +103,6 @@ toolchain was later invoked explicitly through `$HOME/.cargo/bin/cargo.exe`.
 - The offline fixture passed: three acceptance checks, signed provenance, SBOM output, and `verify-file` all completed without provider credentials.
 - The multi-stage Docker image built successfully and its isolated container smoke test returned
   `/health` with HTTP 200, reached Docker `healthy`, and ran as the non-root `flowforge` user.
+- HTTP responses now carry baseline security headers, and unexpected route failures return a
+  generic client error while retaining diagnostic details in the server log.
 - A fresh visual screenshot of the modified UI remains unverified because no browser-control surface was available in the execution environment.
