@@ -58,6 +58,10 @@ try {
     if ($responses["/"].RawContentLength -lt 1000) {
         throw "root UI response was unexpectedly small"
     }
+    if ($responses["/"].Content -notmatch "Other forges: server mode" -or
+        $responses["/"].Content -match "Gitea/Forgejo \(planned\)") {
+        throw "served UI contains stale forge capability copy"
+    }
 
     Add-Type -AssemblyName System.Net.Http
     $client = [System.Net.Http.HttpClient]::new()

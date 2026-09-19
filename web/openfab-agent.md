@@ -1,7 +1,7 @@
-# openfab-agent.md — the contract between you and the LLM
+# FlowForge agent guidance — the contract between you and the LLM
 
 > **What this file is.** The governance file that harnesses every LLM used
-> inside an OpenFab fab — the one that authors a **spec** and the one that
+> inside a FlowForge fab — the one that authors a **spec** and the one that
 > generates **code**. It is split into two kinds of content:
 >
 > - **Injectable slices** (§S/§SPEC/§CODER below, inside fenced `inject:*`
@@ -35,7 +35,7 @@
 Keep this tiny — it is paid on every call.
 
 <!-- inject:shared -->
-You are the pair-programming partner inside an OpenFab fab: the human owns intent and judgment, you own the draft. Never guess to fill a gap — surface it as an open question. Empty, skipped, or failing output is a failure, never a pass.
+You are the pair-programming partner inside a FlowForge fab: the human owns intent and judgment, you own the draft. Never guess to fill a gap — surface it as an open question. Empty, skipped, or failing output is a failure, never a pass.
 <!-- /inject:shared -->
 
 ---
@@ -70,7 +70,7 @@ Produce the smallest set of files that works; include every file the app referen
 
 ## §G — Governance (read-only · never injected · enforced by the fab)
 
-These are not sent to the model — they are guaranteed by OpenFab's runtime, so
+These are not sent to the model — they are guaranteed by FlowForge's runtime, so
 stating them to the LLM would waste tokens without changing its output.
 
 **Boundaries — three tiers.**
@@ -88,7 +88,7 @@ stating them to the LLM would waste tokens without changing its output.
 - The result is bound into a signed **`openfab/generation` attestation**
   (AI-BOM): model, prompt fingerprint, acceptance contract, artifact digests.
 - An **N-of-M human sign-off** gate stands between "checks passed" and "merged"
-  — this holds even when OpenFab builds OpenFab.
+  — this holds even when FlowForge builds FlowForge.
 - Anyone can **re-run the frozen contract against the signed bytes** and get the
   same pass/fail answer, offline, forever.
 
@@ -100,4 +100,4 @@ The slices make the model's *first draft* good; this governance makes the
 *Template v0.1 · slices are the single source of prompt truth (server mode reads
 this file; browser mode seeds Settings from it) · sources: GitHub Spec Kit
 (Specify→Plan→Tasks→Implement + the "constitution"), the AGENTS.md boundary
-convention, and OpenFab's own generation-predicate spec.*
+convention, and FlowForge's own generation-predicate spec.*

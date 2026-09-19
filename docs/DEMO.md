@@ -1,4 +1,4 @@
-# OpenFab demo walkthrough
+# FlowForge demo walkthrough
 
 ## Run it
 

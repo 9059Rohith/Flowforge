@@ -3,7 +3,7 @@
 // + SBOM (zero auth, always works); (2) push to GitHub via the git-data REST API with a
 // fine-grained PAT — code AND attestation land in ONE commit, so the artifact and its
 // proof are born bound together. The remote repo is the durable, versioned record
-// (there is no git in a browser). Gitea/Forgejo: planned; shown disabled until real.
+// (there is no git in a browser). Other forge adapters remain available through server mode.
 
 const ForgePush = (() => {
   // ---- minimal ZIP writer (STORED entries, CRC32) — no dependencies ----
@@ -52,7 +52,7 @@ const ForgePush = (() => {
     const blob = zip(bundleEntries(artifacts));
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `${artifacts.run.spec_ref.replace("#", "-")}-openfab-bundle.zip`;
+    a.download = `${artifacts.run.spec_ref.replace("#", "-")}-flowforge-bundle.zip`;
     a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   }
 

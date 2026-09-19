@@ -1,5 +1,5 @@
 "use strict";
-// ops_browser — browser-mode backend for OpenFab Web. Implements the SAME JSON API the
+// ops_browser — browser-mode backend for FlowForge Web. Implements the SAME JSON API the
 // Rust server exposes (the API is the ops port), entirely client-side: the browser swarm
 // generates, js: acceptance checks run for real, attestations are Ed25519-signed
 // (did:key), and run state lives in IndexedDB. Routes a static page cannot honestly
@@ -333,7 +333,7 @@ const OpsBrowser = (() => {
   }
 
   // ---- the route dispatcher: same contract as the Rust JSON API ----
-  const CAP = (what) => { const e = new Error(`${what} needs the local OpenFab server (browser mode has no host sandbox / git) — everything else here is real: generation, checks, signing, verify`); e.status = 501; throw e; };
+  const CAP = (what) => { const e = new Error(`${what} needs the local FlowForge server (browser mode has no host sandbox / git) — everything else here is real: generation, checks, signing, verify`); e.status = 501; throw e; };
 
   async function dispatch(method, url, body) {
     const u = new URL(url, location.origin); const p = u.pathname; const q = u.searchParams;

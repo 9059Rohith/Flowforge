@@ -158,7 +158,7 @@
           <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px">
             <button class="btn ok sm" id="dlbundle" type="button" style="width:auto">⬇ Download bundle (code + attestation + SBOM)</button>
             <button class="btn sm" id="ghpushbtn" type="button" style="width:auto">⬆ Push to GitHub…</button>
-            <button class="btn ghost sm" type="button" style="width:auto" disabled title="Planned — needs a CORS-enabled instance">Gitea/Forgejo (planned)</button>
+            <span class="chip muted" title="Forgejo, Gitea, and GitCode adapters are available in server mode; browser publishing supports GitHub or bundle download.">Other forges: server mode</span>
           </div>
           <div id="ghpushform" class="hidden" style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
             <input type="text" id="ghowner" placeholder="owner" style="width:130px" />
@@ -265,7 +265,7 @@
     </div>
   </details>
   <details class="card scard" id="agentcard">
-    <summary><h2>Agent guidance <span class="muted">(openfab-agent.md — system prompts, injected per role)</span></h2></summary>
+    <summary><h2>Agent guidance <span class="muted">(shipped guidance file — system prompts, injected per role)</span></h2></summary>
     <div class="scard-body">
     <div class="hint" style="margin-bottom:8px">
       These slices are the <b>only</b> text sent to the model, and only the slice each call needs — so edits are cheap and take effect on your <b>next</b> run of that role. The shared slice is paid on every call; keep it short. Runtime guardrails (sandbox, signing, N-of-M sign-off) are enforced by the fab and never injected. <a href="openfab-agent.md" target="_blank" rel="noopener">read the full file →</a>
