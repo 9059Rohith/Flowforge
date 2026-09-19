@@ -45,7 +45,7 @@ User intent
 ## Integrations
 
 - Agent bases: Claude CLI, Codex CLI, AgentScope, HiClaw, agent-chat, OpenHands.
-- LLM providers: Claude/Codex CLIs, Ollama-compatible endpoint, DashScope/Qwen.
+- LLM providers: Claude/Codex CLIs, OpenAI, Groq, Ollama-compatible endpoint, DashScope/Qwen.
 - Forges: local git, GitHub via `gh`, Forgejo/Gitea/GitCode via REST + git.
 - Static deployment: GitHub Pages workflow for `web/`.
 
@@ -65,7 +65,7 @@ These areas are core behavior and were intentionally preserved:
 - Environment variable names consumed by code.
 - `openfab/generation` predicate identifiers and `OpenFab-*` commit trailers.
 
-## Baseline Validation
+## Historical Baseline Validation
 
 Attempted commands:
 
@@ -76,13 +76,15 @@ cargo test
 cargo build --release
 ```
 
-Result: blocked before code execution because `cargo` and `rustc` are not installed on PATH in this workspace. `$HOME/.cargo/bin/cargo.exe` is also absent. `git`, Node, Python, Chrome, and Edge are present.
+Result: the initial audit shell did not have `cargo` on PATH. The installed stable GNU
+toolchain was later invoked explicitly through `$HOME/.cargo/bin/cargo.exe`.
 
 ## Deployment Notes
 
 - `.env.example` documents runtime configuration without secrets.
 - `.gitignore` excludes `.env`, `.env.*`, `*.env`, and runtime signing seed directories.
 - The GitHub Pages automation template no longer writes the previous custom-domain CNAME. It is stored outside the active workflow directory until the target GitHub credential has workflow scope.
+- The CI automation is prepared as `.github/ci-workflow.yml` and remains outside the active workflow directory until the GitHub credential has `workflow` scope.
 - No live deployment was performed because no deployment access or account authorization was provided.
 
 ## Post-change Validation
@@ -92,5 +94,8 @@ Result: blocked before code execution because `cargo` and `rustc` are not instal
 - `cargo +stable-x86_64-pc-windows-gnu test` passed: 55 tests.
 - `cargo +stable-x86_64-pc-windows-gnu build --release` passed.
 - The release server returned HTTP 200 for `/`, `/api/bases`, and `/api/forges` in an isolated smoke workspace.
+- The release server returned HTTP 200 and `{"status":"ok"}` for `/health` in an isolated smoke workspace.
 - Node syntax checks passed for all five browser JavaScript modules.
 - Python syntax checks passed for the AgentScope and HiClaw adapters.
+- The intent builder includes responsive starter workflow patterns for triage, recurring reports, and release readiness.
+- A fresh visual screenshot of the modified UI remains unverified because no browser-control surface was available in the execution environment.
