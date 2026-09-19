@@ -9,7 +9,7 @@ This document captures OpenFab's architecture decisions and its recursive (self-
 
 ## 0. Implementation status — what ships today (v0.2)
 
-The repository implements this PRD through **v0.1** (the hand-built Core + CLI engine) and **v0.2** (a built-in web UI + the full base/forge matrix). The table maps each planned choice to what is actually built, so the document stays honest about the gap (R14). Every lighter choice names its production swap; nothing is faked or overstated. `cargo fmt` + `clippy -D warnings` + **59 tests** are green.
+The repository implements this PRD through **v0.1** (the hand-built Core + CLI engine) and **v0.2** (a built-in web UI + the full base/forge matrix). The table maps each planned choice to what is actually built, so the document stays honest about the gap (R14). Every lighter choice names its production swap; nothing is faked or overstated. `cargo fmt` + `clippy -D warnings` + **60 tests** are green.
 
 | Area | PRD intent (production target) | Built today (v0.2) |
 |---|---|---|
