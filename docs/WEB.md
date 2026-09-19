@@ -1,4 +1,4 @@
-# OpenFab web UI
+# FlowForge web UI
 
 The visual, end-to-end demo. One binary serves the UI *and* the API (the whole SPA is
 `include_str!`'d into the binary — nothing to install, matching the sovereign posture).
@@ -48,7 +48,7 @@ openfab serve --repo demo/.work/web --port 8787 --policy policy/trust.json
    (`Spec`, `Co-Authored-By` agent DID, `OpenFab-Base`, `OpenFab-Attestation`,
    `OpenFab-Acceptance`, `OpenFab-Signoff`) — and a **"verify independently"** panel with
    the exact `git` / `jq` / `cosign` / `slsa-verifier` commands a third party runs to
-   inspect/verify the same artifacts **without OpenFab** (the EU-CRA / SLSA audit story).
+   inspect/verify the same artifacts **without FlowForge** (the EU-CRA / SLSA audit story).
 7. **Reproduce & verify** (the sovereign proof). Re-verifies the signature, confirms the
    committed source is **bit-identical** to the signed digests, and **re-runs every
    acceptance check** in the sandbox — "trust nothing, verify everything".
@@ -84,7 +84,7 @@ POST /api/runs/{id}/exec {cmd}                      -> run the product in the sa
 
 ## Independent verification (no OpenFab required)
 
-Everything OpenFab produces is in **standard, portable formats committed in the repo**, so
+Everything FlowForge produces is in **standard, portable formats committed in the repo**, so
 the audit trail is readable and verifiable by third-party tools — the proof it isn't
 locked into OpenFab and travels across forges:
 
@@ -97,7 +97,7 @@ locked into OpenFab and travels across forges:
 | SLSA provenance (production path) | **slsa-verifier** | `slsa-verifier verify-artifact …` |
 
 Push a run to a *live* forge (set its env) and the same commit graph + trailers render
-natively in the GitHub/Gitea/Forgejo web UI — cross-forge, OpenFab-independent.
+natively in the GitHub/Gitea/Forgejo web UI — cross-forge, FlowForge-independent.
 
 ## Honesty notes (R14)
 

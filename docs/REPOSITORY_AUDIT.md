@@ -93,7 +93,7 @@ toolchain was later invoked explicitly through `$HOME/.cargo/bin/cargo.exe`.
 
 - `cargo +stable-x86_64-pc-windows-gnu fmt --all -- --check` passed.
 - `cargo +stable-x86_64-pc-windows-gnu clippy --all-targets --all-features -- -D warnings` passed.
-- `cargo +stable-x86_64-pc-windows-gnu test` passed: 58 tests.
+- `cargo +stable-x86_64-pc-windows-gnu test` passed: 60 tests.
 - `cargo +stable-x86_64-pc-windows-gnu build --release` passed.
 - The release server returned HTTP 200 for `/`, `/api/bases`, and `/api/forges` in an isolated smoke workspace.
 - The release server returned HTTP 200 and `{"status":"ok"}` for `/health` in an isolated smoke workspace.
@@ -105,4 +105,6 @@ toolchain was later invoked explicitly through `$HOME/.cargo/bin/cargo.exe`.
   `/health` with HTTP 200, reached Docker `healthy`, and ran as the non-root `flowforge` user.
 - HTTP responses now carry baseline security headers, and unexpected route failures return a
   generic client error while retaining diagnostic details in the server log.
+- Generated-app launch now exports git archives without a shell-interpolated command, and
+  artifact-opening/child-process cleanup use Windows, macOS, and Linux host commands.
 - A fresh visual screenshot of the modified UI remains unverified because no browser-control surface was available in the execution environment.

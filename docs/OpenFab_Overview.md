@@ -85,7 +85,7 @@ natural language intent
    → Sign (in-toto/SLSA attestation + SBOM, signed; per-file AI/Human attribution)
    → Gate (merge BLOCKED until N-of-M human maintainers sign off — never self-approved)
    → Provenance committed in-repo, portable and forge-neutral
-   → Reproduce & verify — by anyone, anywhere, without OpenFab
+   → Reproduce & verify — by anyone, anywhere, without FlowForge
 ```
 
 Every step is a **signed git commit carrying provenance trailers**. The full trail is plain

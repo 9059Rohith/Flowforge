@@ -254,7 +254,7 @@ fn route(
         (Method::Post, ["api", "runs", id, "open"]) => {
             let _g = state.lock.lock().unwrap();
             let dir = ops::export_run_bundle(&state.repo, id)?;
-            let _ = Command::new("open").arg(&dir).status();
+            reveal_path(&dir);
             Ok(json_resp(
                 200,
                 &json!({ "path": dir.display().to_string() }),
@@ -471,7 +471,7 @@ fn open_app(id: &str, state: &Arc<State>) -> Result<Response<std::io::Cursor<Vec
         .find(|a| a.id == id)
         .ok_or_else(|| anyhow::anyhow!("no such app"))?;
     let dir = ops::export_app_dir(&state.repo, &app.latest_run)?;
-    let _ = Command::new("open").arg(&dir).status();
+    reveal_path(&dir);
     Ok(json_resp(
         200,
         &json!({ "path": dir.display().to_string() }),
@@ -502,20 +502,8 @@ fn launch_app(id: &str, state: &Arc<State>) -> Result<Response<std::io::Cursor<V
     let dest = state.repo.join(".openfab").join("launch").join(id);
     let _ = std::fs::remove_dir_all(&dest);
     std::fs::create_dir_all(&dest)?;
-    let exported = Command::new("sh")
-        .arg("-c")
-        .arg(format!(
-            "git -C '{}' archive '{}' | tar -x -C '{}'",
-            state.repo.display(),
-            rec.branch,
-            dest.display()
-        ))
-        .status()
-        .map(|s| s.success())
-        .unwrap_or(false);
-    if !exported {
-        anyhow::bail!("could not export the run's source for launch");
-    }
+    export_git_branch(&state.repo, &rec.branch, &dest)
+        .context("could not export the run's source for launch")?;
 
     let port = free_port()?;
     let Some((cmd, workdir, file)) = plan_launch(&dest, port) else {
@@ -550,7 +538,7 @@ fn launch_app(id: &str, state: &Arc<State>) -> Result<Response<std::io::Cursor<V
             &json!({ "kind": "web", "url": format!("http://127.0.0.1:{port}"), "file": file, "pid": pid }),
         ))
     } else {
-        let _ = Command::new("kill").arg("-9").arg(pid.to_string()).status();
+        terminate_process(pid);
         Ok(json_resp(
             200,
             &json!({
@@ -564,7 +552,7 @@ fn launch_app(id: &str, state: &Arc<State>) -> Result<Response<std::io::Cursor<V
 
 fn stop_app(id: &str, state: &Arc<State>) {
     if let Some((pid, _)) = state.launched.lock().unwrap().remove(id) {
-        let _ = Command::new("kill").arg("-9").arg(pid.to_string()).status();
+        terminate_process(pid);
     }
 }
 
@@ -573,8 +561,59 @@ fn stop_app(id: &str, state: &Arc<State>) {
 fn stop_all_apps(state: &Arc<State>) {
     let mut m = state.launched.lock().unwrap();
     for (_, (pid, _)) in m.drain() {
-        let _ = Command::new("kill").arg("-9").arg(pid.to_string()).status();
+        terminate_process(pid);
     }
+}
+
+/// Export a committed run without invoking a shell. Keeping each value as a process
+/// argument avoids quoting bugs and command injection through repository or branch names.
+fn export_git_branch(repo: &Path, branch: &str, dest: &Path) -> Result<()> {
+    let mut archive = Command::new("git")
+        .arg("-C")
+        .arg(repo)
+        .arg("archive")
+        .arg(branch)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+        .context("starting git archive")?;
+    let archive_stdout = archive
+        .stdout
+        .take()
+        .context("capturing git archive output")?;
+    let extract = Command::new("tar")
+        .args(["-x", "-C"])
+        .arg(dest)
+        .stdin(archive_stdout)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .context("extracting git archive with tar")?;
+    let archived = archive.wait().context("waiting for git archive")?;
+    if !archived.success() || !extract.success() {
+        anyhow::bail!("git archive extraction failed");
+    }
+    Ok(())
+}
+
+/// Open a generated artifact in the host file manager when the platform supports it.
+/// Failure is intentionally non-fatal: the API still returns the exported path.
+fn reveal_path(path: &Path) {
+    #[cfg(target_os = "windows")]
+    let _ = Command::new("explorer.exe").arg(path).status();
+    #[cfg(target_os = "macos")]
+    let _ = Command::new("open").arg(path).status();
+    #[cfg(all(unix, not(target_os = "macos")))]
+    let _ = Command::new("xdg-open").arg(path).status();
+}
+
+fn terminate_process(pid: u32) {
+    #[cfg(target_os = "windows")]
+    let _ = Command::new("taskkill")
+        .args(["/PID", &pid.to_string(), "/T", "/F"])
+        .status();
+    #[cfg(not(target_os = "windows"))]
+    let _ = Command::new("kill").args(["-9", &pid.to_string()]).status();
 }
 
 /// Decide how to run the product in a browser: an actual web server (reads `PORT`), or a
@@ -804,9 +843,12 @@ fn header(name: &str, value: &str) -> Header {
 
 #[cfg(test)]
 mod tests {
-    use serde_json::json;
+    use std::process::Command;
 
-    use super::{json_resp, FABENGINE_JS, OPENFAB_AGENT_MD};
+    use serde_json::json;
+    use tempfile::tempdir;
+
+    use super::{export_git_branch, json_resp, FABENGINE_JS, OPENFAB_AGENT_MD};
 
     /// Extract the text between `<!-- inject:NAME -->` and `<!-- /inject:NAME -->`.
     fn inject_block<'a>(md: &'a str, name: &str) -> &'a str {
@@ -857,5 +899,38 @@ mod tests {
                 "missing security header {name}"
             );
         }
+    }
+
+    #[test]
+    fn exports_a_committed_branch_without_shell_interpolation() {
+        if Command::new("tar").arg("--version").output().is_err() {
+            // The runtime launch path requires tar; environments without it cannot exercise
+            // this integration-level regression test.
+            return;
+        }
+        let repo = tempdir().unwrap();
+        let dest = tempdir().unwrap();
+        let run = |args: &[&str]| {
+            let status = Command::new("git")
+                .args(["-C", repo.path().to_str().unwrap()])
+                .args(args)
+                .status()
+                .unwrap();
+            assert!(status.success(), "git command failed: {args:?}");
+        };
+        run(&["init", "-b", "main"]);
+        run(&["config", "user.email", "flowforge-tests@example.invalid"]);
+        run(&["config", "user.name", "FlowForge Tests"]);
+        std::fs::write(repo.path().join("index.html"), "<h1>FlowForge</h1>\n").unwrap();
+        run(&["add", "index.html"]);
+        run(&["commit", "-m", "fixture"]);
+
+        export_git_branch(repo.path(), "HEAD", dest.path()).unwrap();
+        assert_eq!(
+            std::fs::read_to_string(dest.path().join("index.html"))
+                .unwrap()
+                .trim_end(),
+            "<h1>FlowForge</h1>"
+        );
     }
 }

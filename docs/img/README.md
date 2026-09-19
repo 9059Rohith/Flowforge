@@ -1,6 +1,6 @@
 # Screenshots
 
-Captured from the OpenFab web UI (`openfab serve` → http://127.0.0.1:8787) and referenced
+Captured from the FlowForge web UI (`openfab serve` → http://127.0.0.1:8787) and referenced
 from the top-level [`README.md`](../../README.md).
 
 ### Overview

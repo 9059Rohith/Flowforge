@@ -9,7 +9,7 @@ This directory describes a reproducible evaluation plan for the productivity and
 | Build integrity | `cargo fmt`, clippy with warnings denied, tests, release build | Passed locally with stable GNU Windows toolchain |
 | Workflow availability | Start the release server and query `/`, `/api/bases`, and `/api/forges` | Passed in an isolated smoke workspace |
 | Server smoke | Run `powershell -ExecutionPolicy Bypass -File .\evals\smoke_server.ps1` | Credential-free HTTP smoke check for health, UI, base catalog, and forge catalog |
-| Contract enforcement | Run the Rust trust, provenance, conformance, sandbox, and Codex safety unit tests | 58 tests passed locally |
+| Contract enforcement | Run the Rust trust, provenance, conformance, sandbox, and Codex safety unit tests | 60 tests passed locally |
 | Browser safety | Syntax-check all browser modules and inspect the opaque-origin iframe path | Passed locally |
 | Secret hygiene | Scan tracked and hidden files for key-shaped material | Clean after removing a secret-shaped example value |
 | Product workflow | Run the demo temperature-converter spec through an authenticated provider | Requires a configured provider and is not claimed as completed here |
