@@ -30,10 +30,10 @@
     <div>
       <div class="firstrun hidden" id="firstrun">
         <div class="fr-title">👋 Welcome to FlowForge</div>
-        <div class="fr-body">This runs <b>entirely in your browser</b> — it generates a small app, checks it, and produces a <b>signed AI-BOM</b>, with nothing installed. First, add an LLM provider so FlowForge has a model to use. <b>Your API key stays in this browser</b> (it's only sent to the provider you choose).</div>
+        <div class="fr-body">This runs <b>entirely in your browser</b> — it generates a small app, checks it, and produces a <b>signed AI-BOM</b>, with nothing installed. First, add an LLM provider so FlowForge has a model to use. <b>Your browser-mode API key stays in this browser</b> and is sent only to the provider you choose; server mode can use OpenAI or Groq from your local <code>.env</code>.</div>
         <div class="fr-actions">
           <button class="btn ok sm" id="fr-open" type="button" style="width:auto">⚙ Configure LLM in Settings</button>
-          <span class="fr-hint">OpenRouter is the easiest zero-install option.</span>
+          <span class="fr-hint">OpenAI and Groq are supported; OpenRouter is also available in browser mode.</span>
         </div>
       </div>
       <div class="card collapsible" id="buildcard">
