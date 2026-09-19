@@ -1,0 +1,9 @@
+flowchart LR
+    Intent --> Spec[Spec and acceptance]
+    Spec --> Generate[Generate]
+    Generate --> Verify[Verify]
+    Verify --> Inspect[Inspect result]
+    Inspect --> Decide{Approve?}
+    Decide -->|Refine| Spec
+    Decide -->|Release| Sign[Sign and gate]
+    Sign --> Portable[Portable proof]

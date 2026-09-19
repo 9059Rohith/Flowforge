@@ -1,0 +1,41 @@
+/target
+**/*.rs.bk
+Cargo.lock.bak
+.env
+.env.*
+!.env.example
+*.env
+
+# macOS junk
+.DS_Store
+**/.DS_Store
+
+# Local editor/agent state (machine-specific paths — never publish)
+.claude/
+
+# OpenFab runtime state: private signing seeds never get committed (AGENTS.md safety rule).
+**/.openfab/identity/
+**/.openfab/maintainers/
+.openfab/identity/
+.openfab/maintainers/
+
+# Demo scratch repos (the local "forges" the demo spins up)
+/demo/.work/
+/demo/out/
+/artifacts/
+__pycache__/
+*.py[cod]
+
+# Office temp/lock files
+~$*
+**/~$*
+
+# Stray generated-app / python artifacts at repo root
+/app/
+**/__pycache__/
+
+# Presentation binaries are generated locally (docs/build_todo_wg_deck.py); not for the repo.
+*.pptx
+*.ppt
+~$*.pptx
+docs/OpenFab_Presentation*.pdf

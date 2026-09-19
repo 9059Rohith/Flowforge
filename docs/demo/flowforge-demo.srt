@@ -1,0 +1,23 @@
+1
+00:00:00,000 --> 00:00:20,000
+AI can generate a useful tool quickly, but teams still need to verify what was generated and who approved it.
+
+2
+00:00:20,000 --> 00:00:45,000
+FlowForge turns a plain-language request into a visible, reviewable automation workflow.
+
+3
+00:00:45,000 --> 00:01:35,000
+The model authors the request and acceptance contract, then the generated files are checked through the policy gate.
+
+4
+00:01:35,000 --> 00:02:05,000
+Before approval, the user can run or inspect the generated product and review its artifact bundle.
+
+5
+00:02:05,000 --> 00:02:35,000
+Release mode records file digests, model metadata, a prompt hash, acceptance evidence, an SBOM, and maintainer signatures.
+
+6
+00:02:35,000 --> 00:03:00,000
+Reproduction rechecks the signatures, source hashes, and frozen acceptance contract from the committed artifact.

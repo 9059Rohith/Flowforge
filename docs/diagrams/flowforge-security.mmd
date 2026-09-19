@@ -1,0 +1,10 @@
+flowchart TD
+    User --> Request[Validated intent]
+    Request --> Model[Selected model or agent base]
+    Model --> Files[Generated files]
+    Files --> Policy[Command policy]
+    Policy --> Timeout[Execution timeout]
+    Timeout --> Checks[Acceptance checks]
+    Checks --> Human[Maintainer sign-off]
+    Human --> Attestation[Signed attestation]
+    Attestation --> Reproduce[Hash and signature recheck]

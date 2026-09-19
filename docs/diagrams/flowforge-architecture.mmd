@@ -1,0 +1,14 @@
+flowchart TD
+    User[User intent] --> UI[FlowForge UI or CLI]
+    UI --> API[Server API or CLI commands]
+    API --> Ops[Shared operations layer]
+    Ops --> Cycle[Spec cycle]
+    Cycle --> Base[BasePort]
+    Cycle --> Forge[ForgePort]
+    Cycle --> Policy[Policy-gated checks]
+    Base --> Generated[Generated files]
+    Policy --> Evidence[Acceptance evidence]
+    Forge --> Evidence
+    Generated --> Attestation[Signed attestation and SBOM]
+    Evidence --> Attestation
+    Attestation --> Verify[Offline verification and reproduction]
