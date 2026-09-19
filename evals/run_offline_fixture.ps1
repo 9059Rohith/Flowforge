@@ -1,16 +1,21 @@
 param(
+    [ValidateSet("repetitive-request-triage", "temperature-converter")]
+    [string]$FixtureName = "repetitive-request-triage",
     [string]$Policy = "policy/trust.json"
 )
 
 $ErrorActionPreference = "Stop"
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\")).Path
 $binary = Join-Path $root "target\release\openfab.exe"
-$fixture = Join-Path $root "evals\fixtures\temperature-converter"
-$work = Join-Path ([System.IO.Path]::GetTempPath()) ("flowforge-offline-fixture-" + $PID)
+$fixture = Join-Path $root ("evals\fixtures\" + $FixtureName)
+$work = Join-Path ([System.IO.Path]::GetTempPath()) ("flowforge-offline-fixture-" + $FixtureName + "-" + $PID)
 $locationPushed = $false
 
 if (-not (Test-Path -LiteralPath $binary)) {
     throw "Release binary not found at $binary. Run cargo build --release first."
+}
+if (-not (Test-Path -LiteralPath $fixture)) {
+    throw "Unknown offline fixture at $fixture."
 }
 
 try {
@@ -30,7 +35,7 @@ try {
     if (-not $attestation) { throw "offline attestation did not produce a signed attestation" }
     & $binary verify-file --repo $work --att (Join-Path $work (Join-Path "provenance" $attestation.Name)) --policy (Join-Path $root $Policy)
     if ($LASTEXITCODE -ne 0) { throw "offline forge-agnostic verification failed" }
-    Write-Output "OFFLINE_FIXTURE_PASS: acceptance, signed provenance, and verify-file passed"
+    Write-Output "OFFLINE_FIXTURE_PASS: $FixtureName acceptance, signed provenance, and verify-file passed"
 }
 finally {
     if ($locationPushed) {

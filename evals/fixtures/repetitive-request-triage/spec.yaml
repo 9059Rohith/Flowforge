@@ -1,0 +1,21 @@
+id: offline-repetitive-request-triage
+version: 1
+intent: >
+  Turn a small set of repetitive team requests into a deterministic, prioritized
+  markdown action queue with a self-test.
+language: python
+target_dir: app
+assumptions:
+  - "Outage, blocked, security, and urgent requests are P1."
+  - "Today, deadline, failed, and broken requests are P2; other requests are P3."
+acceptance:
+  - id: a1-selftest
+    check: "python3 app/triage.py --selftest"
+    must_pass: true
+  - id: a2-priority-output
+    check: "python3 app/triage.py notes.txt | grep -q '## P1'"
+    must_pass: true
+  - id: a3-action-content
+    check: "python3 app/triage.py notes.txt | grep -q 'monthly usage report'"
+    must_pass: true
+human_signoff_required: true

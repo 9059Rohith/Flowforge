@@ -32,7 +32,7 @@ stronger evidence model.
 | UX | ScreenOps: focused capture-to-action story | Make FlowForge's first-run workflow template-led and outcome-led |
 | Deployment | ScreenOps: public demo path | Deploy only after health, auth, persistence, and provider smoke tests pass |
 | Documentation | Both have architecture and AI usage docs | Keep implementation, partial, blocked, and planned claims visibly separate |
-| Evaluation | ScreenOps publishes extraction/planning eval results | FlowForge now has a repeatable offline fixture covering acceptance, signing, and provenance verification; provider-backed generation remains separate |
+| Evaluation | ScreenOps publishes extraction/planning eval results | FlowForge now has repeatable offline fixtures, including a productivity-oriented triage queue, covering acceptance, signing, and provenance verification; provider-backed generation remains separate |
 
 ## FlowForge Completion Gates
 

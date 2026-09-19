@@ -12,7 +12,7 @@ This directory describes a reproducible evaluation plan for the productivity and
 | Browser safety | Syntax-check all browser modules and inspect the opaque-origin iframe path | Passed locally |
 | Secret hygiene | Scan tracked and hidden files for key-shaped material | Clean after removing a secret-shaped example value |
 | Product workflow | Run the demo temperature-converter spec through an authenticated provider | Requires a configured provider and is not claimed as completed here |
-| Offline trust workflow | Run `powershell -ExecutionPolicy Bypass -File .\evals\run_offline_fixture.ps1` | Passed locally: acceptance, signed provenance, and `verify-file` all passed without credentials |
+| Offline trust workflow | Run `powershell -ExecutionPolicy Bypass -File .\evals\run_offline_fixture.ps1` | Passed locally for the repetitive-request triage fixture: acceptance, signed provenance, and `verify-file` all passed without credentials |
 
 ## Killer workflow case
 
@@ -42,14 +42,17 @@ node --check web/ops_browser.js
 
 For a full product run, configure one of the supported providers, then use [`docs/DEMO.md`](../docs/DEMO.md). Do not substitute a fake result when a provider is unavailable.
 
-The offline fixture is a deterministic evidence check, not an AI-generation benchmark. It
-attests a pre-existing converter, runs its acceptance contract in the sandbox, signs the
-result, and verifies the source and contract again. It requires the release binary, Git,
-Python 3, and no API key or network access.
+The offline fixtures are deterministic evidence checks, not an AI-generation benchmark. The
+default repetitive-request triage fixture turns notes into a prioritized markdown action queue;
+the temperature-converter fixture preserves the original product demo. Each fixture is attested
+as a pre-existing artifact, runs its acceptance contract in the sandbox, signs the result, and
+verifies the source and contract again. They require the release binary, Git, Python 3, and no
+API key or network access.
 
 ```powershell
 cargo build --release
 powershell -ExecutionPolicy Bypass -File .\evals\run_offline_fixture.ps1
+powershell -ExecutionPolicy Bypass -File .\evals\run_offline_fixture.ps1 -FixtureName temperature-converter
 ```
 
 ## Future measured metrics
