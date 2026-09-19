@@ -14,6 +14,8 @@ The acceptance and provenance stages are deterministic application logic. They d
 - Claude CLI and Codex CLI can provide native local bases when installed and authenticated.
 - AgentScope, HiClaw, agent-chat, and OpenHands can be used through their configured adapters.
 - Ollama-compatible and DashScope/Qwen paths can provide LLM-backed generation where configured.
+- OpenAI and Groq are first-class server-side OpenAI-compatible providers; Groq is also listed in
+  browser settings for discoverability, but direct browser CORS support is intentionally not claimed.
 - Browser mode uses a user-selected OpenAI-compatible provider from the page and keeps the key in browser storage.
 
 The exact provider and model are recorded in run metadata when available. Configuration is supplied through environment variables or explicit browser settings; credentials are not part of the repository.

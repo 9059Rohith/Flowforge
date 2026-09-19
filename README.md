@@ -193,6 +193,8 @@ Deployment providers should inject variables through their secure environment UI
 - OpenAI and Groq are called through their OpenAI-compatible Chat Completions APIs. Their API keys
   stay server-side in local/server mode. The model must be available to the account and support
   JSON responses because FlowForge requests structured specs and file manifests.
+- Browser mode lists Groq as a server-recommended provider but does not claim direct browser CORS
+  support; use server mode or an authenticated proxy for Groq rather than exposing a key to a page.
 - Codex generation defaults to read-only execution. Set `OPENFAB_CODEX_SANDBOX=workspace-write` only when needed; dangerous full access requires a separate opt-in.
 - `OPENFAB_GITHUB_REMOTE` and an authenticated `gh` CLI for GitHub.
 - `OPENFAB_FORGEJO_*`, `OPENFAB_GITEA_*`, or `OPENFAB_GITCODE_*` for REST forge adapters.

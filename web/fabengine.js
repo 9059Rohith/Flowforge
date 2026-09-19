@@ -92,6 +92,7 @@ const FabEngine = (() => {
     { id: "openrouter", name: "OpenRouter (browser-ready ✓)", baseUrl: "https://openrouter.ai/api/v1", browser: true },
     { id: "anthropic", name: "Anthropic Claude (browser-ready ✓)", baseUrl: "https://api.anthropic.com/v1", browser: true },
     { id: "openai", name: "OpenAI", baseUrl: "https://api.openai.com/v1", browser: true },
+    { id: "groq", name: "Groq (server-side recommended)", baseUrl: "https://api.groq.com/openai/v1", browser: false },
     { id: "ollama-cloud", name: "Ollama Cloud (no browser CORS yet ⚠)", baseUrl: "https://ollama.com/v1", browser: false },
     { id: "dashscope", name: "DashScope / Qwen", baseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1", browser: false },
     { id: "nvidia", name: "NVIDIA NIM", baseUrl: "https://integrate.api.nvidia.com/v1", browser: false },
