@@ -108,6 +108,16 @@ fn route(
 ) -> Result<Response<std::io::Cursor<Vec<u8>>>> {
     let segs: Vec<&str> = path.trim_matches('/').split('/').collect();
     match (method, segs.as_slice()) {
+        // Liveness probe for local supervisors and deployment platforms. This intentionally
+        // reports process health only; provider credentials and workspace details stay private.
+        (Method::Get, ["health"]) => Ok(json_resp(
+            200,
+            &json!({
+                "status": "ok",
+                "service": "flowforge",
+                "version": env!("CARGO_PKG_VERSION")
+            }),
+        )),
         // --- static UI ---
         (Method::Get, [""]) | (Method::Get, ["index.html"]) => Ok(html(INDEX_HTML)),
         (Method::Get, ["app.js"]) => Ok(asset(APP_JS, "application/javascript")),

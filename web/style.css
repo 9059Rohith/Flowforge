@@ -140,6 +140,14 @@ textarea, input[type=text], select {
 }
 textarea { min-height: 96px; line-height: 1.45; }
 textarea:focus, input:focus, select:focus { outline: none; border-color: var(--accent2); }
+.starter-head { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.starter-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
+.starter {
+  min-height: 46px; padding: 8px 9px; border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--bg2); color: var(--muted); font: 600 11.5px/1.25 var(--sans); text-align: left; cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, background .15s ease;
+}
+.starter:hover, .starter:focus-visible { border-color: var(--accent2); color: var(--ink); background: var(--panel2); outline: none; }
 
 .selectrow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .pickwrap { position: relative; }
@@ -341,6 +349,7 @@ table.rep td.mono { font-family: var(--mono); font-size: 11px; }
   .modebadge { margin-left: 0; margin-right: 0; }
   header.top .btn.sm { padding: 8px 11px; }
   .selectrow { grid-template-columns: 1fr; }
+  .starter-grid { grid-template-columns: 1fr; }
   .grid, .grid > div, .card, .firstrun, .adv, textarea, input[type=text], select, .btn { min-width: 0; max-width: 100%; }
   .grid { width: calc(100vw - 28px); padding-right: 0; }
   .card { padding: 15px; width: 100%; }

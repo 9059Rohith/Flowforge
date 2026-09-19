@@ -40,6 +40,15 @@
         <h2><span class="n">1</span> What do you want to build?</h2>
         <label class="fld">Describe it in plain English — the Base (LLM) writes the spec &amp; acceptance</label>
         <textarea id="intent" placeholder="e.g. a command-line tool that converts temperatures between Celsius, Fahrenheit and Kelvin, with a --selftest flag that verifies all conversions"></textarea>
+        <div class="starter-head">
+          <span class="hint">Start with a workflow pattern</span>
+          <span class="hint">select one to edit it</span>
+        </div>
+        <div class="starter-grid" id="starterflows" aria-label="Starter workflow patterns">
+          <button class="starter" type="button" data-intent="Build a command-line triage tool that reads a folder of support notes, extracts action items, groups them by urgency, and writes a deterministic markdown action queue with a --selftest command.">Triage repetitive requests</button>
+          <button class="starter" type="button" data-intent="Build a small report automation tool that reads a CSV export, validates required columns, produces a concise summary report, and writes a machine-checkable verification log.">Automate a recurring report</button>
+          <button class="starter" type="button" data-intent="Build a release checklist tool that validates required files and commands, records pass or fail evidence, and produces a reproducible release-readiness report.">Create a release checklist</button>
+        </div>
 
         <details class="adv" id="basemode" style="margin-top:12px">
           <summary>Base &amp; mode <span class="muted" id="basemodesum"></span></summary>

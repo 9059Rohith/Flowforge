@@ -102,6 +102,13 @@ async function init() {
   document.querySelectorAll(".tab").forEach((t) => (t.onclick = () => selectTab(t.dataset.tab)));
   document.querySelectorAll(".card.collapsible > h2").forEach((h) =>
     (h.onclick = () => h.parentElement.classList.toggle("collapsed")));
+  document.querySelectorAll(".starter[data-intent]").forEach((starter) => {
+    starter.onclick = () => {
+      $("#intent").value = starter.dataset.intent;
+      $("#intent").focus();
+      toast("Starter workflow loaded — edit the request, then fabricate it.");
+    };
+  });
   $("#settingsbtn").onclick = () => toggleDrawer(true);
   $("#drawerclose").onclick = () => toggleDrawer(false);
   $("#drawerscrim").onclick = () => toggleDrawer(false);

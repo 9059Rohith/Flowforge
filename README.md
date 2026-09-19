@@ -217,6 +217,11 @@ Publish `web/` to GitHub Pages, Netlify, Cloudflare Pages, or another static hos
 
 The Pages automation template is [`.github/pages-workflow.yml`](.github/pages-workflow.yml). Activate it as `.github/workflows/pages.yml` after authenticating with GitHub workflow scope.
 
+The repository CI workflow template is [`.github/ci-workflow.yml`](.github/ci-workflow.yml). Move
+it to `.github/workflows/ci.yml` after authenticating with GitHub workflow scope; it runs Rust
+formatting, clippy, tests, release build, and browser JavaScript syntax checks. A lightweight
+liveness probe is available at `GET /health` when the local/server binary is running.
+
 ### Local or server mode
 
 Run the release binary on a host with a persistent workspace:
@@ -272,6 +277,7 @@ Verified in this workspace with stable Rust 1.98.1 using the GNU Windows toolcha
 - [`docs/demo/flowforge-demo.srt`](docs/demo/flowforge-demo.srt): draft subtitle timing for a 3-minute recording.
 - [`docs/poster/flowforge-poster.html`](docs/poster/flowforge-poster.html): printable hackathon poster layout.
 - [`docs/HACKATHON_ALIGNMENT.md`](docs/HACKATHON_ALIGNMENT.md): factual track mapping and reviewer notes.
+- [`docs/COMPETITIVE_BENCHMARK.md`](docs/COMPETITIVE_BENCHMARK.md): evidence-based comparison with the ScreenOps reference repository.
 - [`evals/README.md`](evals/README.md): reproducible evaluation plan and canonical workflow case.
 
 No demo video has been recorded and no public video link is claimed.
@@ -279,7 +285,7 @@ No demo video has been recorded and no public video link is claimed.
 ## Roadmap
 
 - Replace the fallback host subprocess with a production container runtime such as Podman or gVisor.
-- Add an authenticated server deployment profile and health endpoint.
+- Add an authenticated server deployment profile.
 - Add Rust integration tests around HTTP routes and the full local forge cycle.
 - Add automated screenshot capture in CI.
 - Expand live forge deployment examples for user-owned accounts.
