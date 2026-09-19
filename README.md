@@ -109,6 +109,10 @@ FlowForge has two distinct AI responsibilities:
 
 Acceptance checks are deterministic commands or browser JavaScript checks, not a second model opinion. The human gate remains explicit. See [`AI_USAGE.md`](AI_USAGE.md).
 
+### Codex integration
+
+Codex is a first-class native base, not a README-only claim. The adapter invokes `codex exec`, captures the final JSON manifest, records the provider and model in the run, and sends the generated files through the same acceptance, provenance, and sign-off path as every other base. Source evidence is documented in [`docs/agent-architecture.md`](docs/agent-architecture.md).
+
 ## Technology Stack
 
 - Rust 2021 with `clap` for the CLI.
@@ -137,6 +141,7 @@ Acceptance checks are deterministic commands or browser JavaScript checks, not a
 |-- schemas/               # spec and provenance schemas
 |-- policy/                # trust policy and Rego reference
 |-- docs/                  # architecture, demo, audit, and submission material
+|-- evals/                 # reproducible evaluation plan and workflow case
 |-- demo/                  # local demo scripts
 |-- integrations/          # optional agent-base adapters
 |-- forges/                # optional Forgejo/Gitea local stack
@@ -178,6 +183,7 @@ The internal binary and protocol identifier remain `openfab` for compatibility. 
 Copy `.env.example` to `.env` and configure only the integrations you use. Important groups include:
 
 - `OPENFAB_LLM` and provider-specific Claude, Codex, Ollama, or DashScope settings.
+- Codex generation defaults to read-only execution. Set `OPENFAB_CODEX_SANDBOX=workspace-write` only when needed; dangerous full access requires a separate opt-in.
 - `OPENFAB_GITHUB_REMOTE` and an authenticated `gh` CLI for GitHub.
 - `OPENFAB_FORGEJO_*`, `OPENFAB_GITEA_*`, or `OPENFAB_GITCODE_*` for REST forge adapters.
 - `OPENFAB_AGENTSCOPE_URL`, `OPENFAB_HICLAW_URL`, `OPENFAB_AGENTCHAT_URL`, and `OPENFAB_OPENHANDS_URL` for optional agent bases.
@@ -239,7 +245,7 @@ cargo test
 cargo build --release
 ```
 
-Verified in this workspace with stable Rust 1.98.1 using the GNU Windows toolchain: formatting, clippy with `-D warnings`, 52 unit tests, and the optimized release build all pass. Browser and integration syntax checks are documented in [`docs/REPOSITORY_AUDIT.md`](docs/REPOSITORY_AUDIT.md).
+Verified in this workspace with stable Rust 1.98.1 using the GNU Windows toolchain: formatting, clippy with `-D warnings`, 55 unit tests, and the optimized release build all pass. Browser and integration syntax checks are documented in [`docs/REPOSITORY_AUDIT.md`](docs/REPOSITORY_AUDIT.md).
 
 ## Demo Materials
 
@@ -247,6 +253,7 @@ Verified in this workspace with stable Rust 1.98.1 using the GNU Windows toolcha
 - [`docs/demo/flowforge-demo.srt`](docs/demo/flowforge-demo.srt): draft subtitle timing for a 3-minute recording.
 - [`docs/poster/flowforge-poster.html`](docs/poster/flowforge-poster.html): printable hackathon poster layout.
 - [`docs/HACKATHON_ALIGNMENT.md`](docs/HACKATHON_ALIGNMENT.md): factual track mapping and reviewer notes.
+- [`evals/README.md`](evals/README.md): reproducible evaluation plan and canonical workflow case.
 
 No demo video has been recorded and no public video link is claimed.
 

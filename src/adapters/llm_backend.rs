@@ -138,6 +138,45 @@ pub fn generate_claude(prompt: &str) -> Result<GenOutput> {
     })
 }
 
+/// Resolve the Codex CLI security controls. The generator only needs to return a manifest, so
+/// read-only is the safe default. Broader access is explicit and danger-full-access requires a
+/// second opt-in to make the risk visible in deployment configuration.
+fn validate_codex_security(
+    sandbox: &str,
+    approvals: &str,
+    allow_dangerous: bool,
+) -> Result<Vec<String>> {
+    if !matches!(
+        sandbox,
+        "read-only" | "workspace-write" | "danger-full-access"
+    ) {
+        bail!("OPENFAB_CODEX_SANDBOX must be read-only, workspace-write, or danger-full-access");
+    }
+    if sandbox == "danger-full-access" && !allow_dangerous {
+        bail!(
+            "danger-full-access requires OPENFAB_CODEX_ALLOW_DANGEROUS=1; prefer read-only or workspace-write"
+        );
+    }
+    if !matches!(approvals, "never" | "on-request") {
+        bail!("OPENFAB_CODEX_APPROVAL_POLICY must be never or on-request");
+    }
+    Ok(vec![
+        "--sandbox".to_string(),
+        sandbox.to_string(),
+        "--ask-for-approval".to_string(),
+        approvals.to_string(),
+    ])
+}
+
+fn codex_security_args() -> Result<Vec<String>> {
+    let sandbox =
+        std::env::var("OPENFAB_CODEX_SANDBOX").unwrap_or_else(|_| "read-only".to_string());
+    let approvals =
+        std::env::var("OPENFAB_CODEX_APPROVAL_POLICY").unwrap_or_else(|_| "never".to_string());
+    let allow_dangerous = std::env::var("OPENFAB_CODEX_ALLOW_DANGEROUS").as_deref() == Ok("1");
+    validate_codex_security(&sandbox, &approvals, allow_dangerous)
+}
+
 /// Run the codex CLI non-interactively (`codex exec`) and return its final message + model.
 /// Uses `--output-last-message <file>` so we capture ONLY the agent's final reply (the JSON
 /// manifest), not the event log. `OPENFAB_CODEX_BIN` overrides the binary, `OPENFAB_CODEX_MODEL`
@@ -153,13 +192,9 @@ fn codex_text(prompt: &str) -> Result<(String, String)> {
         .unwrap_or(0);
     let out_path =
         std::env::temp_dir().join(format!("openfab-codex-{}-{nanos}.txt", std::process::id()));
-    let mut args = vec![
-        "exec".to_string(),
-        "--skip-git-repo-check".to_string(),
-        "--dangerously-bypass-approvals-and-sandbox".to_string(),
-        "-o".to_string(),
-        out_path.display().to_string(),
-    ];
+    let mut args = vec!["exec".to_string(), "--skip-git-repo-check".to_string()];
+    args.extend(codex_security_args()?);
+    args.extend(["-o".to_string(), out_path.display().to_string()]);
     if let Some(m) = &model_override {
         args.push("-m".to_string());
         args.push(m.clone());
@@ -625,5 +660,31 @@ mod tests {
     #[test]
     fn rejects_garbage() {
         assert!(parse_manifest("not json at all").is_err());
+    }
+
+    #[test]
+    fn codex_security_defaults_to_read_only_without_approval() {
+        let args = validate_codex_security("read-only", "never", false).unwrap();
+        assert_eq!(
+            args,
+            vec![
+                "--sandbox".to_string(),
+                "read-only".to_string(),
+                "--ask-for-approval".to_string(),
+                "never".to_string()
+            ]
+        );
+    }
+
+    #[test]
+    fn codex_dangerous_mode_requires_explicit_opt_in() {
+        assert!(validate_codex_security("danger-full-access", "never", false).is_err());
+        assert!(validate_codex_security("danger-full-access", "never", true).is_ok());
+    }
+
+    #[test]
+    fn codex_security_rejects_unknown_modes() {
+        assert!(validate_codex_security("unsafe", "never", false).is_err());
+        assert!(validate_codex_security("read-only", "always", false).is_err());
     }
 }

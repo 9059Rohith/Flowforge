@@ -16,6 +16,7 @@ Implemented controls include:
 - N-of-M maintainer policy modes.
 - Prompt hashes instead of raw prompt text in the attestation.
 - A shared server lock around git-touching operations.
+- Codex generation defaults to read-only sandbox execution; broader modes require explicit configuration.
 
 ## Important deployment limitation
 
@@ -43,6 +44,7 @@ Use [`.env.example`](.env.example) as the configuration template. A credential e
 - Acceptance results do not prove total correctness; they prove only the captured contract passed.
 - Human sign-off can be required before a release is considered accepted.
 - Tool and provider availability should be treated as untrusted external state.
+- Codex full-access mode is disabled unless a separate dangerous-mode opt-in is present.
 
 ## Reporting a vulnerability
 

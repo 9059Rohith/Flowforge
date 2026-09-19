@@ -18,6 +18,8 @@ The acceptance and provenance stages are deterministic application logic. They d
 
 The exact provider and model are recorded in run metadata when available. Configuration is supplied through environment variables or explicit browser settings; credentials are not part of the repository.
 
+The Codex adapter runs `codex exec` with a read-only sandbox and no approval prompts by default. `workspace-write` is an explicit configuration choice. `danger-full-access` is rejected unless `OPENFAB_CODEX_ALLOW_DANGEROUS=1` is also set, and should only be used inside a separately isolated environment.
+
 ## Prompt and context handling
 
 The agent guidance file is [`web/openfab-agent.md`](web/openfab-agent.md). The server embeds it and browser mode can load it as the shipped guidance baseline. Browser users may override guidance in settings; those overrides are local to the browser.

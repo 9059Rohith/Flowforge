@@ -29,7 +29,7 @@ The project is designed around portable trust evidence. A forge can host the res
 - **Risk:** server mode is not yet a remote multi-tenant service. **Response:** it is documented as a local-first binary and requires an external authentication boundary before remote exposure.
 - **Risk:** the fallback sandbox is not container isolation. **Response:** provenance records the actual `gated-host-subprocess` runtime and the roadmap names container isolation as unfinished.
 - **Risk:** there is no live demo in this workspace. **Response:** the README does not claim one; the local demo path and recording script are prepared.
-- **Risk:** the Rust toolchain is unavailable in this environment. **Response:** the exact blocked commands are documented rather than presented as passing.
+- **Risk:** a live deployment and video are not available in this workspace. **Response:** the repository provides a local smoke-tested flow, real screenshots, a recording script, subtitles, and no fabricated public URLs.
 
 ## Benchmark comparison
 
