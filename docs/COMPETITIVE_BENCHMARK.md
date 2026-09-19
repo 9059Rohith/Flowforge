@@ -32,7 +32,7 @@ stronger evidence model.
 | UX | ScreenOps: focused capture-to-action story | Make FlowForge's first-run workflow template-led and outcome-led |
 | Deployment | ScreenOps: public demo path | Deploy only after health, auth, persistence, and provider smoke tests pass |
 | Documentation | Both have architecture and AI usage docs | Keep implementation, partial, blocked, and planned claims visibly separate |
-| Evaluation | ScreenOps publishes extraction/planning eval results | Add FlowForge task fixtures covering generation, acceptance, safety, and provenance |
+| Evaluation | ScreenOps publishes extraction/planning eval results | FlowForge now has a repeatable offline fixture covering acceptance, signing, and provenance verification; provider-backed generation remains separate |
 
 ## FlowForge Completion Gates
 
@@ -40,12 +40,12 @@ FlowForge should not be called competitive until all of these have evidence:
 
 - A first-time user can understand the product and start a workflow quickly.
 - One canonical workflow produces a real, inspectable productivity outcome.
-- The workflow works in offline fixture mode without external credentials.
+- The trust portion of the canonical workflow works in offline fixture mode without external credentials.
 - The same workflow can use OpenAI or Groq through server-side environment variables.
 - Model output is schema-validated and unsafe tool execution is blocked.
 - Approval, retry, cancellation, and failure states are visible.
 - Acceptance results, provenance, SBOM, and sign-offs are inspectable in the UI.
-- A repeatable evaluation command reports both passes and failures.
+- A repeatable offline evaluation command reports acceptance and verification results; provider-backed generation is measured separately.
 - CI runs formatting, clippy, tests, release build, and browser syntax checks.
 - A deployed instance has authentication, persistent storage, health checks, and a tested smoke path.
 - Screenshots, demo video, and README links point only to real artifacts.

@@ -91,11 +91,12 @@ toolchain was later invoked explicitly through `$HOME/.cargo/bin/cargo.exe`.
 
 - `cargo +stable-x86_64-pc-windows-gnu fmt --all -- --check` passed.
 - `cargo +stable-x86_64-pc-windows-gnu clippy --all-targets --all-features -- -D warnings` passed.
-- `cargo +stable-x86_64-pc-windows-gnu test` passed: 55 tests.
+- `cargo +stable-x86_64-pc-windows-gnu test` passed: 57 tests.
 - `cargo +stable-x86_64-pc-windows-gnu build --release` passed.
 - The release server returned HTTP 200 for `/`, `/api/bases`, and `/api/forges` in an isolated smoke workspace.
 - The release server returned HTTP 200 and `{"status":"ok"}` for `/health` in an isolated smoke workspace.
 - Node syntax checks passed for all five browser JavaScript modules.
 - Python syntax checks passed for the AgentScope and HiClaw adapters.
 - The intent builder includes responsive starter workflow patterns for triage, recurring reports, and release readiness.
+- The offline fixture passed: three acceptance checks, signed provenance, SBOM output, and `verify-file` all completed without provider credentials.
 - A fresh visual screenshot of the modified UI remains unverified because no browser-control surface was available in the execution environment.

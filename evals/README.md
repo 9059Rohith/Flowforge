@@ -8,10 +8,11 @@ This directory describes a reproducible evaluation plan for the productivity and
 | --- | --- | --- |
 | Build integrity | `cargo fmt`, clippy with warnings denied, tests, release build | Passed locally with stable GNU Windows toolchain |
 | Workflow availability | Start the release server and query `/`, `/api/bases`, and `/api/forges` | Passed in an isolated smoke workspace |
-| Contract enforcement | Run the Rust trust, provenance, conformance, sandbox, and Codex safety unit tests | 55 tests passed locally |
+| Contract enforcement | Run the Rust trust, provenance, conformance, sandbox, and Codex safety unit tests | 57 tests passed locally |
 | Browser safety | Syntax-check all browser modules and inspect the opaque-origin iframe path | Passed locally |
 | Secret hygiene | Scan tracked and hidden files for key-shaped material | Clean after removing a secret-shaped example value |
 | Product workflow | Run the demo temperature-converter spec through an authenticated provider | Requires a configured provider and is not claimed as completed here |
+| Offline trust workflow | Run `powershell -ExecutionPolicy Bypass -File .\evals\run_offline_fixture.ps1` | Passed locally: acceptance, signed provenance, and `verify-file` all passed without credentials |
 
 ## Killer workflow case
 
@@ -40,6 +41,16 @@ node --check web/ops_browser.js
 ```
 
 For a full product run, configure one of the supported providers, then use [`docs/DEMO.md`](../docs/DEMO.md). Do not substitute a fake result when a provider is unavailable.
+
+The offline fixture is a deterministic evidence check, not an AI-generation benchmark. It
+attests a pre-existing converter, runs its acceptance contract in the sandbox, signs the
+result, and verifies the source and contract again. It requires the release binary, Git,
+Python 3, and no API key or network access.
+
+```powershell
+cargo build --release
+powershell -ExecutionPolicy Bypass -File .\evals\run_offline_fixture.ps1
+```
 
 ## Future measured metrics
 

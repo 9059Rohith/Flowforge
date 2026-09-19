@@ -1,0 +1,19 @@
+id: offline-temperature-converter
+version: 1
+intent: >
+  Verify a small command-line temperature converter and its signed release evidence.
+language: python
+target_dir: app
+assumptions:
+  - "Celsius, Fahrenheit, and Kelvin conversions use standard formulas."
+acceptance:
+  - id: a1-selftest
+    check: "python3 app/convert.py --selftest"
+    must_pass: true
+  - id: a2-c2f
+    check: "python3 app/convert.py 100 c2f | grep -q 212"
+    must_pass: true
+  - id: a3-f2c
+    check: "python3 app/convert.py 32 f2c | grep -q '^0'"
+    must_pass: true
+human_signoff_required: true
