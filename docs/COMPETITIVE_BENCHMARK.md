@@ -8,8 +8,8 @@ engineering benchmark, not a claim that either project is universally better.
 
 ScreenOps currently has the stronger judge-facing proof of one concrete workplace outcome:
 browser-local screen and audio understanding, structured intent extraction, Google Workspace
-actions, approval, verification, and a deployed demo path. Its README reports 15/15 extraction
-and 15/15 planning evaluation cases.
+actions, approval, verification, and a deployed demo path. At public HEAD `d1a4ff5`, its README
+reports 16/16 extraction and 15/15 planning evaluation cases.
 
 FlowForge has a different technical advantage: natural-language intent becomes a generated,
 acceptance-tested artifact with signed provenance, SBOM data, AI/human attribution, human
