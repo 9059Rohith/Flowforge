@@ -276,6 +276,8 @@ Verified in this workspace with stable Rust 1.98.1 using the GNU Windows toolcha
 
 The credential-free trust path is also reproducible with [`evals/run_offline_fixture.ps1`](evals/run_offline_fixture.ps1): the default repetitive-request fixture turns notes into a prioritized action queue, runs three sandboxed acceptance checks, writes signed provenance and an SBOM, and re-verifies the source and contract with `verify-file`. This fixture does not claim provider-backed AI generation; that path requires a configured OpenAI, Groq, or other supported provider.
 
+The release server smoke path is reproducible with [`evals/smoke_server.ps1`](evals/smoke_server.ps1). It starts a temporary local workspace, checks `/health`, the embedded UI, `/api/bases`, and `/api/forges`, then removes the workspace without requiring provider credentials.
+
 ## Demo Materials
 
 - [`docs/demo-script.md`](docs/demo-script.md): timed narration, actions, expected states, and fallback path.
