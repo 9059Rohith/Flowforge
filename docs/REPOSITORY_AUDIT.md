@@ -91,7 +91,7 @@ toolchain was later invoked explicitly through `$HOME/.cargo/bin/cargo.exe`.
 
 - `cargo +stable-x86_64-pc-windows-gnu fmt --all -- --check` passed.
 - `cargo +stable-x86_64-pc-windows-gnu clippy --all-targets --all-features -- -D warnings` passed.
-- `cargo +stable-x86_64-pc-windows-gnu test` passed: 57 tests.
+- `cargo +stable-x86_64-pc-windows-gnu test` passed: 58 tests.
 - `cargo +stable-x86_64-pc-windows-gnu build --release` passed.
 - The release server returned HTTP 200 for `/`, `/api/bases`, and `/api/forges` in an isolated smoke workspace.
 - The release server returned HTTP 200 and `{"status":"ok"}` for `/health` in an isolated smoke workspace.

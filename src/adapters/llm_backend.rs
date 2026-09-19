@@ -17,6 +17,7 @@
 
 use std::collections::BTreeMap;
 use std::io::Read;
+use std::path::{Component, Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::mpsc;
 use std::thread;
@@ -628,29 +629,66 @@ fn parse_authored_spec(text: &str) -> Result<AuthoredSpec> {
 
 /// Write a manifest into `workdir`, returning the changed-file records (with content
 /// hashes for attribution). Refuses path escapes outside the workdir.
-pub fn write_manifest(workdir: &std::path::Path, manifest: &Manifest) -> Result<Vec<ChangedFile>> {
+pub fn write_manifest(workdir: &Path, manifest: &Manifest) -> Result<Vec<ChangedFile>> {
     if manifest.files.is_empty() {
         bail!("agent returned an empty file manifest");
     }
+    let root = std::fs::canonicalize(workdir)
+        .with_context(|| format!("canonicalizing manifest workdir {}", workdir.display()))?;
     let mut changed = Vec::new();
     for (rel, contents) in &manifest.files {
-        let safe_rel = rel.trim_start_matches('/');
-        if safe_rel.contains("..") {
-            bail!("agent tried to write outside the workdir: {rel}");
-        }
-        let abs = workdir.join(safe_rel);
-        if let Some(parent) = abs.parent() {
-            std::fs::create_dir_all(parent)?;
-        }
+        let abs = safe_manifest_path(workdir, &root, rel)?;
         std::fs::write(&abs, contents)
             .with_context(|| format!("writing generated file {}", abs.display()))?;
         changed.push(ChangedFile {
-            path: safe_rel.to_string(),
+            path: rel.to_string(),
             lines: contents.lines().count(),
             sha256: sha256_hex(contents.as_bytes()),
         });
     }
     Ok(changed)
+}
+
+/// Resolve an agent-provided path without allowing it to escape the target workspace.
+/// Component checks handle absolute and parent paths before filesystem access; canonical
+/// containment and symlink checks protect existing directories and files on the boundary.
+fn safe_manifest_path(workdir: &Path, root: &Path, rel: &str) -> Result<PathBuf> {
+    let path = Path::new(rel);
+    if rel.trim().is_empty()
+        || path.is_absolute()
+        || path.components().any(|component| {
+            matches!(
+                component,
+                Component::Prefix(_) | Component::RootDir | Component::ParentDir
+            )
+        })
+    {
+        bail!("agent tried to write outside the workdir: {rel}");
+    }
+
+    let abs = workdir.join(path);
+    let parent = abs
+        .parent()
+        .context("agent manifest path did not have a parent directory")?;
+    std::fs::create_dir_all(parent)?;
+    let canonical_parent = std::fs::canonicalize(parent)?;
+    if !canonical_parent.starts_with(root) {
+        bail!("agent manifest parent escaped the workdir: {rel}");
+    }
+
+    let candidate = canonical_parent.join(
+        abs.file_name()
+            .context("agent manifest path did not have a file name")?,
+    );
+    if let Ok(metadata) = std::fs::symlink_metadata(&candidate) {
+        if metadata.file_type().is_symlink() {
+            bail!("agent tried to overwrite a symlink: {rel}");
+        }
+    }
+    if candidate.exists() && !std::fs::canonicalize(&candidate)?.starts_with(root) {
+        bail!("agent manifest file escaped the workdir: {rel}");
+    }
+    Ok(candidate)
 }
 
 fn timeout_secs() -> Duration {
@@ -790,6 +828,50 @@ mod tests {
     #[test]
     fn rejects_garbage() {
         assert!(parse_manifest("not json at all").is_err());
+    }
+
+    #[test]
+    fn manifest_paths_cannot_escape_the_workdir() {
+        let workdir = std::env::temp_dir().join(format!(
+            "openfab-manifest-path-test-{}-{}",
+            std::process::id(),
+            crate::core::timeutil::unix_now()
+        ));
+        std::fs::create_dir_all(&workdir).unwrap();
+        let safe = Manifest {
+            files: [("app/ok.txt".to_string(), "ok\n".to_string())]
+                .into_iter()
+                .collect(),
+            notes: String::new(),
+        };
+        write_manifest(&workdir, &safe).unwrap();
+        assert_eq!(
+            std::fs::read_to_string(workdir.join("app/ok.txt")).unwrap(),
+            "ok\n"
+        );
+
+        let parent_escape = Manifest {
+            files: [("../escape.txt".to_string(), "nope".to_string())]
+                .into_iter()
+                .collect(),
+            notes: String::new(),
+        };
+        assert!(write_manifest(&workdir, &parent_escape).is_err());
+
+        let absolute_escape = Manifest {
+            files: [(
+                std::env::temp_dir()
+                    .join("openfab-absolute-escape.txt")
+                    .display()
+                    .to_string(),
+                "nope".to_string(),
+            )]
+            .into_iter()
+            .collect(),
+            notes: String::new(),
+        };
+        assert!(write_manifest(&workdir, &absolute_escape).is_err());
+        std::fs::remove_dir_all(workdir).unwrap();
     }
 
     #[test]

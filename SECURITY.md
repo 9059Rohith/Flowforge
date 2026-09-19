@@ -11,6 +11,7 @@ Implemented controls include:
 - Policy checks before sandbox command execution.
 - Hard execution timeouts for acceptance and ad-hoc product commands.
 - Process output capture with explicit failure results.
+- Component-aware generated-file path validation with canonical workspace containment and symlink rejection.
 - Opaque-origin sandboxed iframes for browser-authored JavaScript checks.
 - Signed attestations over artifact digests.
 - N-of-M maintainer policy modes.
