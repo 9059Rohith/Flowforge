@@ -342,7 +342,8 @@ table.rep td.mono { font-family: var(--mono); font-size: 11px; }
 .toast.err { border-color: #5e2222; color: var(--bad); }
 
 @media (max-width: 560px) {
-  .wrap { max-width: 100vw; padding: 22px 14px 64px; }
+  .wrap { width: 100%; max-width: 100%; padding: 22px 14px 64px; overflow-x: clip; }
+  .drawer { width: 100vw; max-width: 100vw; border-left: 0; padding: 14px; }
   header.top { gap: 10px; }
   .brand { flex: 1 1 calc(100% - 64px); min-width: 0; }
   .brand p { overflow-wrap: anywhere; }
@@ -351,9 +352,13 @@ table.rep td.mono { font-family: var(--mono); font-size: 11px; }
   .selectrow { grid-template-columns: 1fr; }
   .starter-grid { grid-template-columns: 1fr; }
   .grid, .grid > div, .card, .firstrun, .adv, textarea, input[type=text], select, .btn { min-width: 0; max-width: 100%; }
-  .grid { width: calc(100vw - 28px); padding-right: 0; }
+  .grid { display: block; width: 100%; max-width: 100%; padding-right: 0; }
+  .grid > div { width: 100%; max-width: 100%; }
   .card { padding: 15px; width: 100%; }
   .firstrun { width: 100%; }
+  .firstrun .fr-body, .firstrun .fr-hint, .card h2, .hint { overflow-wrap: anywhere; }
+  .starter-head { flex-wrap: wrap; }
+  .btn { white-space: normal; }
   .card h2 { line-height: 1.35; }
   .chips { margin-bottom: 18px; }
 }

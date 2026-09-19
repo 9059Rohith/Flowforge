@@ -107,4 +107,7 @@ toolchain was later invoked explicitly through `$HOME/.cargo/bin/cargo.exe`.
   generic client error while retaining diagnostic details in the server log.
 - Generated-app launch now exports git archives without a shell-interpolated command, and
   artifact-opening/child-process cleanup use Windows, macOS, and Linux host commands.
-- A fresh visual screenshot of the modified UI remains unverified because no browser-control surface was available in the execution environment.
+- The refreshed mobile screenshot in `assets/screenshots/flowforge-mobile.png` was captured
+  from the release server at a narrow CSS viewport, manually inspected for clipping and
+  horizontal overflow, and committed as a real asset; the connected browser surface itself
+  was unavailable, so interactive click-through remains unclaimed.
