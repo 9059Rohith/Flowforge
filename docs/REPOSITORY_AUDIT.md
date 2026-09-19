@@ -84,3 +84,13 @@ Result: blocked before code execution because `cargo` and `rustc` are not instal
 - `.gitignore` excludes `.env`, `.env.*`, `*.env`, and runtime signing seed directories.
 - The GitHub Pages automation template no longer writes the previous custom-domain CNAME. It is stored outside the active workflow directory until the target GitHub credential has workflow scope.
 - No live deployment was performed because no deployment access or account authorization was provided.
+
+## Post-change Validation
+
+- `cargo +stable-x86_64-pc-windows-gnu fmt --all -- --check` passed.
+- `cargo +stable-x86_64-pc-windows-gnu clippy --all-targets --all-features -- -D warnings` passed.
+- `cargo +stable-x86_64-pc-windows-gnu test` passed: 52 tests.
+- `cargo +stable-x86_64-pc-windows-gnu build --release` passed.
+- The release server returned HTTP 200 for `/`, `/api/bases`, and `/api/forges` in an isolated smoke workspace.
+- Node syntax checks passed for all five browser JavaScript modules.
+- Python syntax checks passed for the AgentScope and HiClaw adapters.

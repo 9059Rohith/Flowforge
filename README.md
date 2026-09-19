@@ -239,7 +239,7 @@ cargo test
 cargo build --release
 ```
 
-Browser and integration syntax checks used during repository preparation are documented in [`docs/REPOSITORY_AUDIT.md`](docs/REPOSITORY_AUDIT.md). Rust validation remains dependent on installing the Rust toolchain in the execution environment.
+Verified in this workspace with stable Rust 1.98.1 using the GNU Windows toolchain: formatting, clippy with `-D warnings`, 52 unit tests, and the optimized release build all pass. Browser and integration syntax checks are documented in [`docs/REPOSITORY_AUDIT.md`](docs/REPOSITORY_AUDIT.md).
 
 ## Demo Materials
 

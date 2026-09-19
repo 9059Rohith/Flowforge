@@ -50,4 +50,4 @@ Do not publish credentials or exploit details in a public issue. Once the reposi
 
 ## Security review status
 
-Repository scans performed during preparation found no committed API keys, private keys, or known token-shaped secrets. Rust dependency audit and runtime penetration testing remain blocked until the Rust toolchain and a configured deployment environment are available.
+Repository scans performed during preparation found no committed API keys, private keys, or known token-shaped secrets. A dedicated dependency audit and runtime penetration test have not been performed; the current verification covers source tests, static checks, secret scanning, and a local server smoke test.
